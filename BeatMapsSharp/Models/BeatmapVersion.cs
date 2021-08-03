@@ -6,7 +6,7 @@ namespace BeatMapsSharp.Models
     /// <summary>
     /// Represents a specific version of a Beatmap
     /// </summary>
-    public class BeatmapVersion
+    public class BeatmapVersion : IEquatable<BeatmapVersion>
     {
         /// <summary>
         /// The time this version was creeated.
@@ -47,6 +47,15 @@ namespace BeatMapsSharp.Models
         /// The testplays associated with this version.
         /// </summary>
         public IReadOnlyList<BeatmapTestplay>? Testplays { get; set; }
+
+
+        // Equality Methods
+
+        public bool Equals(BeatmapVersion? other) => Key == other?.Key;
+        public override int GetHashCode() => Key.GetHashCode();
+        public override bool Equals(object? obj) => Equals(obj as BeatmapVersion);
+        public static bool operator ==(BeatmapVersion left, BeatmapVersion right) => Equals(left, right);
+        public static bool operator !=(BeatmapVersion left, BeatmapVersion right) => Equals(left, right);
 
         public enum VersionState
         {

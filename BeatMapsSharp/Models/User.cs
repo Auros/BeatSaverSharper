@@ -1,9 +1,11 @@
-﻿namespace BeatMapsSharp.Models
+﻿using System;
+
+namespace BeatMapsSharp.Models
 {
     /// <summary>
     /// A BeatMaps user.
     /// </summary>
-    public class User
+    public class User : IEquatable<User>
     {
         /// <summary>
         /// The avatar URL of the user.
@@ -29,5 +31,15 @@
         /// The mapping stats of the user.
         /// </summary>
         public UserStats? Stats { get; set; }
+
+
+        // Equality Methods
+
+        public bool Equals(User? other) => ID == other?.ID;
+        public override int GetHashCode() => ID.GetHashCode();
+        public override bool Equals(object? obj) => Equals(obj as User);
+        public static bool operator ==(User left, User right) => Equals(left, right);
+        public static bool operator !=(User left, User right) => Equals(left, right);
+
     }
 }

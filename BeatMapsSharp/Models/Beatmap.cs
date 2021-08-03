@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace BeatMapsSharp.Models
@@ -6,7 +7,7 @@ namespace BeatMapsSharp.Models
     /// <summary>
     /// A BeatMaps beatmap.
     /// </summary>
-    public class Beatmap
+    public class Beatmap : IEquatable<Beatmap>
     {
         /// <summary>
         /// Was this map made by an auto-mapper?
@@ -24,7 +25,7 @@ namespace BeatMapsSharp.Models
         public string Description { get; set; } = null!;
 
         /// <summary>
-        /// The ID, or "key" of the map.
+        /// The ID of the map.
         /// </summary>
         public int ID { get; set; }
 
@@ -63,9 +64,23 @@ namespace BeatMapsSharp.Models
         /// </summary>
         public User User { get; set; } = null!;
 
+        [JsonProperty("versions")]
+        private List<BeatmapVersion> BeatmapVersions { get; set; } = null!;
+
         /// <summary>
         /// The versions of this map.
         /// </summary>
-        public IReadOnlyList<BeatmapVersion> Versions { get; set; } = null!;
+        [JsonIgnore]
+        public IReadOnlyList<BeatmapVersion> Versions => BeatmapVersions.AsReadOnly();
+
+
+        // Equality Methods
+
+        public bool Equals(Beatmap? other) => ID == other?.ID;
+        public override int GetHashCode() => ID.GetHashCode();
+        public override bool Equals(object? obj) => Equals(obj as Beatmap);
+        public static bool operator ==(Beatmap left, Beatmap right) => Equals(left, right);
+        public static bool operator !=(Beatmap left, Beatmap right) => Equals(left, right);
+
     }
 }
