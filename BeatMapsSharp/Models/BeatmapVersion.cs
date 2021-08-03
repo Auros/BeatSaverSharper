@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace BeatMapsSharp.Models
@@ -57,6 +56,24 @@ namespace BeatMapsSharp.Models
         /// </summary>
         [JsonProperty("testplays")]
         public ReadOnlyCollection<BeatmapTestplay>? Testplays { get; internal set; }
+
+        /// <summary>
+        /// The relative URL of where the cover image is stored.
+        /// </summary>
+        [JsonProperty("coverURL")]
+        public string CoverURL { get; internal set; } = null!;
+
+        /// <summary>
+        /// The difficulties in this map.
+        /// </summary>
+        [JsonProperty("diffs")]
+        public BeatmapDifficulty Difficulties { get; internal set; } = null!;
+
+        /// <summary>
+        /// The relative URL of where to download this version.
+        /// </summary>
+        [JsonProperty("downloadURL")]
+        public string DownloadURL { get; internal set; } = null!;
 
 
         // Equality Methods
