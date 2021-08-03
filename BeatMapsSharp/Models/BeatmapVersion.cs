@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace BeatMapsSharp.Models
@@ -43,10 +44,14 @@ namespace BeatMapsSharp.Models
         /// </summary>
         public DateTime? TestplayAt { get; internal set; }
 
+        [JsonProperty("testplays")]
+        private List<BeatmapTestplay>? BeatmapTestplays { get; set; }
+
         /// <summary>
         /// The testplays associated with this version.
         /// </summary>
-        public IReadOnlyList<BeatmapTestplay>? Testplays { get; internal set; }
+        [JsonIgnore]
+        public IReadOnlyList<BeatmapTestplay>? Testplays => BeatmapTestplays?.AsReadOnly();
 
 
         // Equality Methods
