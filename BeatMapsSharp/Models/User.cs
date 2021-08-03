@@ -10,27 +10,27 @@ namespace BeatMapsSharp.Models
         /// <summary>
         /// The avatar URL of the user.
         /// </summary>
-        public string Avatar { get; set; } = null!;
+        public string Avatar { get; internal set; } = null!;
 
         /// <summary>
         /// The hash of the avatar URL.
         /// </summary>
-        public string Hash { get; set; } = null!;
+        public string Hash { get; internal set; } = null!;
 
         /// <summary>
         /// The name of the user.
         /// </summary>
-        public string Name { get; set; } = null!;
+        public string Name { get; internal set; } = null!;
 
         /// <summary>
         /// The unique ID of the user.
         /// </summary>
-        public int ID { get; set; }
+        public int ID { get; internal set; }
 
         /// <summary>
         /// The mapping stats of the user.
         /// </summary>
-        public UserStats? Stats { get; set; }
+        public UserStats? Stats { get; internal set; }
 
 
         // Equality Methods

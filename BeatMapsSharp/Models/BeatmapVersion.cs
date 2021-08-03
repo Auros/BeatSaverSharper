@@ -11,42 +11,42 @@ namespace BeatMapsSharp.Models
         /// <summary>
         /// The time this version was creeated.
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; internal set; }
 
         /// <summary>
         /// The feedback for this version.
         /// </summary>
-        public string? Feedback { get; set; }
+        public string? Feedback { get; internal set; }
     
         /// <summary>
         /// The sage score.
         /// </summary>
-        public short SageScore { get; set; }
+        public short SageScore { get; internal set; }
 
         /// <summary>
         /// The map's hash.
         /// </summary>
-        public string Hash { get; set; } = null!;
+        public string Hash { get; internal set; } = null!;
 
         /// <summary>
         /// The map's key.
         /// </summary>
-        public string Key { get; set; } = null!;
+        public string Key { get; internal set; } = null!;
     
         /// <summary>
         /// The state of this version.
         /// </summary>
-        public VersionState State { get; set; }
+        public VersionState State { get; internal set; }
 
         /// <summary>
         /// The time at which the most recent testplay was set for this version.
         /// </summary>
-        public DateTime? TestplayAt { get; set; }
+        public DateTime? TestplayAt { get; internal set; }
 
         /// <summary>
         /// The testplays associated with this version.
         /// </summary>
-        public IReadOnlyList<BeatmapTestplay>? Testplays { get; set; }
+        public IReadOnlyList<BeatmapTestplay>? Testplays { get; internal set; }
 
 
         // Equality Methods

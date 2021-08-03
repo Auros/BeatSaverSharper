@@ -10,90 +10,90 @@ namespace BeatMapsSharp.Models
         /// <summary>
         /// The amount of bombs in the difficulty.
         /// </summary>
-        public int Bombs { get; set; }
+        public int Bombs { get; internal set; }
         
         /// <summary>
         /// The characteristic of the difficulty.
         /// </summary>
-        public BeatmapCharacteristic Characteristic { get; set; }
+        public BeatmapCharacteristic Characteristic { get; internal set; }
         
         /// <summary>
         /// Does this difficulty have Chroma support?
         /// </summary>
-        public bool Chroma { get; set; }
+        public bool Chroma { get; internal set; }
 
         /// <summary>
         /// Does this difficulty have Cinema support?
         /// </summary>
-        public bool Cinema { get; set; }
+        public bool Cinema { get; internal set; }
 
         /// <summary>
         /// The difficulty of this difficulty.
         /// </summary>
-        public _BeatmapDifficulty Difficulty { get; set; }
+        public _BeatmapDifficulty Difficulty { get; internal set; }
 
         /// <summary>
         /// The amount of mapping events in this difficulty.
         /// </summary>
-        public int Events { get; set; }
+        public int Events { get; internal set; }
 
         /// <summary>
         /// The length of this song.
         /// </summary>
-        public double Length { get; set; }
+        public double Length { get; internal set; }
 
         /// <summary>
         /// Does this difficulty support mapping extensions?
         /// </summary>
         [JsonProperty("me")]
-        public bool MappingExtensions { get; set; }
+        public bool MappingExtensions { get; internal set; }
 
         /// <summary>
         /// Does this difficulty support noodle extensions?
         /// </summary>
         [JsonProperty("ne")]
-        public bool NoodleExtensions { get; set; }
+        public bool NoodleExtensions { get; internal set; }
 
         /// <summary>
         /// The Note Jump Speed of this difficulty.
         /// </summary>
-        public float NJS { get; set; }
+        public float NJS { get; internal set; }
 
         /// <summary>
         /// The amount of notes in this difficulty.
         /// </summary>
-        public int Notes { get; set; }
+        public int Notes { get; internal set; }
 
         /// <summary>
         /// The notes per second of this difficulty.
         /// </summary>
-        public double NPS { get; set; }
+        public double NPS { get; internal set; }
 
         /// <summary>
         /// The amount of obstacles in this difficulty.
         /// </summary>
-        public int Obstacles { get; set; }
+        public int Obstacles { get; internal set; }
 
         /// <summary>
         /// The spawn offset for this difficulty.
         /// </summary>
-        public float Offset { get; set; }
+        public float Offset { get; internal set; }
 
         /// <summary>
         /// Parity information for this difficulty.
         /// </summary>
         [JsonProperty("paritySummary")]
-        public BeatmapParitySummary Parity { get; set; } = null!;
+        public BeatmapParitySummary Parity { get; internal set; } = null!;
 
         /// <summary>
         /// The length of this song in seconds.
         /// </summary>
-        public double Seconds { get; set; }
+        public double Seconds { get; internal set; }
 
         /// <summary>
         /// The star rating of this difficulty.
         /// </summary>
-        public float? Stars { get; set; }
+        public float? Stars { get; internal set; }
 
         public enum BeatmapCharacteristic
         {

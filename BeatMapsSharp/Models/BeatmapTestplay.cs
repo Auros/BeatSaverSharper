@@ -10,26 +10,26 @@ namespace BeatMapsSharp.Models
         /// <summary>
         /// The time the testplay was initialized.
         /// </summary>
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; internal set; }
 
         /// <summary>
         /// The the time feedback was given.
         /// </summary>
-        public string? Feedback { get; set; }
+        public string? Feedback { get; internal set; }
 
         /// <summary>
         /// The time at which feedback was given.
         /// </summary>
-        public DateTime? FeedbackAt { get; set; }
+        public DateTime? FeedbackAt { get; internal set; }
     
         /// <summary>
         /// A video related to the feedback.
         /// </summary>
-        public string? Video { get; set; }
+        public string? Video { get; internal set; }
 
         /// <summary>
         /// The user who submitted the testplay.
         /// </summary>
-        public User User { get; set; } = null!;
+        public User User { get; internal set; } = null!;
     }
 }
