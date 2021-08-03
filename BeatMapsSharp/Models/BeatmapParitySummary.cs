@@ -1,4 +1,6 @@
-﻿namespace BeatMapsSharp.Models
+﻿using Newtonsoft.Json;
+
+namespace BeatMapsSharp.Models
 {
     /// <summary>
     /// Contains parity information of a beatmap.
@@ -8,16 +10,19 @@
         /// <summary>
         /// The amount of errors in the map.
         /// </summary>
+        [JsonProperty("errors")]
         public int Errors { get; internal set; }
 
         /// <summary>
         /// The amount of resets in the map.
         /// </summary>
+        [JsonProperty("resets")]
         public int Resets { get; internal set; }
 
         /// <summary>
         /// The amount of warnings in the map.
         /// </summary>
+        [JsonProperty("warns")]
         public int Warns { get; internal set; }
     }
 }

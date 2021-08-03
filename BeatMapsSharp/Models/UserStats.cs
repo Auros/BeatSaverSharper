@@ -35,31 +35,37 @@ namespace BeatMapsSharp.Models
         /// <summary>
         /// The time that the user's first map was uploaded.
         /// </summary>
+        [JsonProperty("firstUpload")]
         public DateTime FirstUpload { get; internal set; }
 
         /// <summary>
         /// The time that the user's most recent map was uploaded.
         /// </summary>
+        [JsonProperty("lastUpload")]
         public DateTime LastUpload { get; internal set; }
-    
+
         /// <summary>
         /// The amount of ranked maps a user has uploaded.
         /// </summary>
+        [JsonProperty("rankedMaps")]
         public int RankedMaps { get; internal set; }
 
         /// <summary>
         /// The total amount of downvotes that have accumulated on a user's profile.
         /// </summary>
+        [JsonProperty("totalDownvotes")]
         public int TotalDownvotes { get; internal set; }
 
         /// <summary>
         /// The total amount of maps a user has uploaded.
         /// </summary>
+        [JsonProperty("totalMaps")]
         public int TotalMaps { get; internal set; }
 
         /// <summary>
         /// The total amount of upvotes that have accumulated on a user's profile.
         /// </summary>
+        [JsonProperty("totalUpvotes")]
         public int TotalUpvotes { get; internal set; }
     }
 }

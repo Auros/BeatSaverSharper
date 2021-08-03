@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace BeatMapsSharp.Models
 {
@@ -10,26 +11,31 @@ namespace BeatMapsSharp.Models
         /// <summary>
         /// The avatar URL of the user.
         /// </summary>
+        [JsonProperty("avatar")]
         public string Avatar { get; internal set; } = null!;
 
         /// <summary>
         /// The hash of the avatar URL.
         /// </summary>
+        [JsonProperty("hash")]
         public string Hash { get; internal set; } = null!;
 
         /// <summary>
         /// The name of the user.
         /// </summary>
+        [JsonProperty("name")]
         public string Name { get; internal set; } = null!;
 
         /// <summary>
         /// The unique ID of the user.
         /// </summary>
+        [JsonProperty("id")]
         public int ID { get; internal set; }
 
         /// <summary>
         /// The mapping stats of the user.
         /// </summary>
+        [JsonProperty("stats")]
         public UserStats? Stats { get; internal set; }
 
 

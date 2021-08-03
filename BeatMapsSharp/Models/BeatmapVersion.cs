@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace BeatMapsSharp.Models
 {
@@ -12,46 +13,50 @@ namespace BeatMapsSharp.Models
         /// <summary>
         /// The time this version was creeated.
         /// </summary>
+        [JsonProperty("createdAt")]
         public DateTime CreatedAt { get; internal set; }
 
         /// <summary>
         /// The feedback for this version.
         /// </summary>
+        [JsonProperty("feedback")]
         public string? Feedback { get; internal set; }
-    
+
         /// <summary>
         /// The sage score.
         /// </summary>
+        [JsonProperty("sageScore")]
         public short SageScore { get; internal set; }
 
         /// <summary>
         /// The map's hash.
         /// </summary>
+        [JsonProperty("hash")]
         public string Hash { get; internal set; } = null!;
 
         /// <summary>
         /// The map's key.
         /// </summary>
+        [JsonProperty("key")]
         public string Key { get; internal set; } = null!;
-    
+
         /// <summary>
         /// The state of this version.
         /// </summary>
+        [JsonProperty("state")]
         public VersionState State { get; internal set; }
 
         /// <summary>
         /// The time at which the most recent testplay was set for this version.
         /// </summary>
+        [JsonProperty("testplayAt")]
         public DateTime? TestplayAt { get; internal set; }
-
-        [JsonProperty("testplays")]
-        private List<BeatmapTestplay>? BeatmapTestplays { get; set; }
 
         /// <summary>
         /// The testplays associated with this version.
         /// </summary>
-        [JsonIgnore]
-        public IReadOnlyList<BeatmapTestplay>? Testplays => BeatmapTestplays?.AsReadOnly();
+        [JsonProperty("testplays")]
+        public ReadOnlyCollection<BeatmapTestplay>? Testplays { get; internal set; }
 
 
         // Equality Methods
