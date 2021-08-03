@@ -5,7 +5,7 @@ namespace BeatMapsSharp.Models
     /// <summary>
     /// Represents a playtest of a beatmap.
     /// </summary>
-    public class BeatmapTestplay
+    public class BeatmapTestplay : BeatSaverObject
     {
         /// <summary>
         /// The time the testplay was initialized.

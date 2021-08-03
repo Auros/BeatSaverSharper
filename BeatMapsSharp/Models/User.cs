@@ -5,7 +5,7 @@ namespace BeatMapsSharp.Models
     /// <summary>
     /// A BeatMaps user.
     /// </summary>
-    public class User : IEquatable<User>
+    public class User : BeatSaverObject, IEquatable<User>
     {
         /// <summary>
         /// The avatar URL of the user.

@@ -7,7 +7,7 @@ namespace BeatMapsSharp.Models
     /// <summary>
     /// A BeatMaps beatmap.
     /// </summary>
-    public class Beatmap : IEquatable<Beatmap>
+    public class Beatmap : BeatSaverObject, IEquatable<Beatmap>
     {
         /// <summary>
         /// Was this map made by an auto-mapper?

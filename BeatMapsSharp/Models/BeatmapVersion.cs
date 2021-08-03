@@ -7,7 +7,7 @@ namespace BeatMapsSharp.Models
     /// <summary>
     /// Represents a specific version of a Beatmap
     /// </summary>
-    public class BeatmapVersion : IEquatable<BeatmapVersion>
+    public class BeatmapVersion : BeatSaverObject, IEquatable<BeatmapVersion>
     {
         /// <summary>
         /// The time this version was creeated.
