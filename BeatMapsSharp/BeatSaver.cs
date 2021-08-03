@@ -2,7 +2,7 @@
 
 namespace BeatMapsSharp
 {
-    public class Class1
+    public class BeatSaver
     {
     }
 }
