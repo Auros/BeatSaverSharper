@@ -30,19 +30,19 @@ namespace BeatMapsSharp.Models
         /// The difficulty statistics of all of a user's uploaded maps.
         /// </summary>
         [JsonProperty("diffStats")]
-        public UserDifficultyStats DifficultyStats { get; internal set; } = null!;
+        public UserDifficultyStats? DifficultyStats { get; internal set; }
 
         /// <summary>
         /// The time that the user's first map was uploaded.
         /// </summary>
         [JsonProperty("firstUpload")]
-        public DateTime FirstUpload { get; internal set; }
+        public DateTime? FirstUpload { get; internal set; }
 
         /// <summary>
         /// The time that the user's most recent map was uploaded.
         /// </summary>
         [JsonProperty("lastUpload")]
-        public DateTime LastUpload { get; internal set; }
+        public DateTime? LastUpload { get; internal set; }
 
         /// <summary>
         /// The amount of ranked maps a user has uploaded.

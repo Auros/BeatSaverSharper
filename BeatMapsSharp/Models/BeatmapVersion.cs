@@ -25,7 +25,7 @@ namespace BeatMapsSharp.Models
         /// The sage score.
         /// </summary>
         [JsonProperty("sageScore")]
-        public short SageScore { get; internal set; }
+        public short? SageScore { get; internal set; }
 
         /// <summary>
         /// The map's hash.
@@ -37,7 +37,7 @@ namespace BeatMapsSharp.Models
         /// The map's key.
         /// </summary>
         [JsonProperty("key")]
-        public string Key { get; internal set; } = null!;
+        public string? Key { get; internal set; } = null!;
 
         /// <summary>
         /// The state of this version.
@@ -67,7 +67,7 @@ namespace BeatMapsSharp.Models
         /// The difficulties in this map.
         /// </summary>
         [JsonProperty("diffs")]
-        public BeatmapDifficulty Difficulties { get; internal set; } = null!;
+        public ReadOnlyCollection<BeatmapDifficulty> Difficulties { get; internal set; } = null!;
 
         /// <summary>
         /// The relative URL of where to download this version.
@@ -75,11 +75,16 @@ namespace BeatMapsSharp.Models
         [JsonProperty("downloadURL")]
         public string DownloadURL { get; internal set; } = null!;
 
+        /// <summary>
+        /// The relative URL to find the audio preview file for this map.
+        /// </summary>
+        [JsonProperty("previewURL")]
+        public string PreviewURL { get; internal set; } = null!;
 
         // Equality Methods
 
-        public bool Equals(BeatmapVersion? other) => Key == other?.Key;
-        public override int GetHashCode() => Key.GetHashCode();
+        public bool Equals(BeatmapVersion? other) => Hash == other?.Hash;
+        public override int GetHashCode() => Hash.GetHashCode();
         public override bool Equals(object? obj) => Equals(obj as BeatmapVersion);
         public static bool operator ==(BeatmapVersion left, BeatmapVersion right) => Equals(left, right);
         public static bool operator !=(BeatmapVersion left, BeatmapVersion right) => Equals(left, right);

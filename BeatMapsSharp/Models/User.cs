@@ -18,7 +18,7 @@ namespace BeatMapsSharp.Models
         /// The hash of the avatar URL.
         /// </summary>
         [JsonProperty("hash")]
-        public string Hash { get; internal set; } = null!;
+        public string? Hash { get; internal set; } = null!;
 
         /// <summary>
         /// The name of the user.
