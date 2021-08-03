@@ -31,7 +31,7 @@ namespace BeatMapsSharp.Models
         /// The ID of the map.
         /// </summary>
         [JsonProperty("id")]
-        public int ID { get; internal set; }
+        public string ID { get; internal set; } = null!;
 
         /// <summary>
         /// The metadata for this map.
@@ -72,8 +72,8 @@ namespace BeatMapsSharp.Models
         /// <summary>
         /// The uploader of this map.
         /// </summary>
-        [JsonProperty("user")]
-        public User User { get; internal set; } = null!;
+        [JsonProperty("uploader")]
+        public User Uploader { get; internal set; } = null!;
 
         /// <summary>
         /// The versions of this map.
