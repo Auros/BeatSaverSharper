@@ -27,13 +27,12 @@ namespace BeatSaverSharp.Http
             _httpClient.DefaultRequestHeaders.Add("User-Agent", userAgent);
         }
 
-        public async Task<IHttpResponse> GetAsync(string url, CancellationToken? token, IProgress<double>? progress = null)
+        public async Task<IHttpResponse> GetAsync(string url, CancellationToken token = default, IProgress<double>? progress = null)
         {
-            CancellationToken reqToken = token ?? CancellationToken.None;
             // We read starting with the response headers so we can update the IProgress<double> if it exists, as well as stopping the body if necessary.
-            HttpResponseMessage message = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, reqToken).ConfigureAwait(false);
+            HttpResponseMessage message = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
 
-            if (reqToken.IsCancellationRequested)
+            if (token.IsCancellationRequested)
                 throw new TaskCanceledException();
 
             using MemoryStream ms = new MemoryStream();
@@ -50,7 +49,7 @@ namespace BeatSaverSharp.Http
                 if (read <= 0)
                     break;
 
-                if (reqToken.IsCancellationRequested)
+                if (token.IsCancellationRequested)
                     throw new TaskCanceledException();
 
                 if (length.HasValue)
@@ -64,11 +63,10 @@ namespace BeatSaverSharp.Http
             return new HttpClientResponse(body, message);
         }
 
-        public async Task<IHttpResponse> PostAsync(string url, object? body = null, CancellationToken? token = null)
+        public async Task<IHttpResponse> PostAsync(string url, object? body = null, CancellationToken token = default)
 {
-            CancellationToken reqToken = token ?? CancellationToken.None;
             var serializedBody = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
-            HttpResponseMessage message = await _httpClient.PostAsync(url, serializedBody, reqToken).ConfigureAwait(false);
+            HttpResponseMessage message = await _httpClient.PostAsync(url, serializedBody, token).ConfigureAwait(false);
             return new HttpClientResponse(message);
         }
 

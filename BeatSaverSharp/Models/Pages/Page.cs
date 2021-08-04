@@ -14,7 +14,7 @@ namespace BeatSaverSharp.Models.Pages
             Beatmaps = beatmaps;
         }
 
-        public abstract Task<Page?> Previous(CancellationToken? token = null);
-        public abstract Task<Page?> Next(CancellationToken? token = null);
+        public abstract Task<Page?> Previous(CancellationToken token = default);
+        public abstract Task<Page?> Next(CancellationToken token = default);
     }
 }

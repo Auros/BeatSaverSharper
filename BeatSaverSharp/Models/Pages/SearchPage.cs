@@ -15,12 +15,12 @@ namespace BeatSaverSharp.Models.Pages
             _searchTextFilterOptions = searchTextFilterOption;
         }
 
-        public override Task<Page?> Next(CancellationToken? token = null)
+        public override Task<Page?> Next(CancellationToken token = default)
         {
             return Client.SearchBeatmaps(_searchTextFilterOptions, _pageNumber + 1, token);
         }
 
-        public override Task<Page?> Previous(CancellationToken? token = null)
+        public override Task<Page?> Previous(CancellationToken token = default)
         {
             if (_pageNumber == 0)
                 return Task.FromResult<Page?>(null);

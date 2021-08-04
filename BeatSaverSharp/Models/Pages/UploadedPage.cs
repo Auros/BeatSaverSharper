@@ -15,7 +15,7 @@ namespace BeatSaverSharp.Models.Pages
             PreviousPage = previousPage;
         }
 
-        public override async Task<Page?> Next(CancellationToken? token = null)
+        public override async Task<Page?> Next(CancellationToken token = default)
         {
             if (Beatmaps.Count == 0)
                 return null;
@@ -28,7 +28,7 @@ namespace BeatSaverSharp.Models.Pages
             return nextPage;
         }
 
-        public override Task<Page?> Previous(CancellationToken? token = null)
+        public override Task<Page?> Previous(CancellationToken token = default)
         {
             return Task.FromResult(PreviousPage);
         }

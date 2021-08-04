@@ -6,7 +6,7 @@ namespace BeatSaverSharp.Http
 {
     public interface IHttpService
     {
-        Task<IHttpResponse> GetAsync(string url, CancellationToken? token, IProgress<double>? progress = null);
-        Task<IHttpResponse> PostAsync(string url, object? body = null, CancellationToken? token = null);
+        Task<IHttpResponse> GetAsync(string url, CancellationToken token = default, IProgress<double>? progress = null);
+        Task<IHttpResponse> PostAsync(string url, object? body = null, CancellationToken token = default);
     }
 }

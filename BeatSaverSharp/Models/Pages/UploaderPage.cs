@@ -15,12 +15,12 @@ namespace BeatSaverSharp.Models.Pages
             _pageNumber = pageNumber;
         }
 
-        public override Task<Page?> Next(CancellationToken? token = null)
+        public override Task<Page?> Next(CancellationToken token = default)
         {
             return Client.UploaderBeatmaps(_uploader, _pageNumber + 1, token);
         }
 
-        public override Task<Page?> Previous(CancellationToken? token = null)
+        public override Task<Page?> Previous(CancellationToken token = default)
         {
             if (_pageNumber == 0)
                 return Task.FromResult<Page?>(null);

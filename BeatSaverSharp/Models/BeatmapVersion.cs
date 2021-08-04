@@ -83,22 +83,22 @@ namespace BeatSaverSharp.Models
         [JsonProperty("previewURL")]
         public string PreviewURL { get; internal set; } = null!;
 
-        public Task<VoteResponse> Vote(Vote.Type voteType, Vote.Platform platform, string platformID, string proof, CancellationToken? token = null)
+        public Task<VoteResponse> Vote(Vote.Type voteType, Vote.Platform platform, string platformID, string proof, CancellationToken token = default)
         {
             return Client.Vote(Hash, voteType, platform, platformID, proof, token);
         }
 
-        public Task<byte[]?> DownloadZIP(CancellationToken? token = null, IProgress<double>? progress = null)
+        public Task<byte[]?> DownloadZIP(CancellationToken token = default, IProgress<double>? progress = null)
         {
             return Client.DownloadZIP(this, token, progress);
         }
 
-        public Task<byte[]?> DownloadCoverImage(CancellationToken? token = null, IProgress<double>? progress = null)
+        public Task<byte[]?> DownloadCoverImage(CancellationToken token = default, IProgress<double>? progress = null)
         {
             return Client.DownloadCoverImage(this, token, progress);
         }
 
-        public Task<byte[]?> DownloadPreview(CancellationToken? token = null, IProgress<double>? progress = null)
+        public Task<byte[]?> DownloadPreview(CancellationToken token = default, IProgress<double>? progress = null)
         {
             return Client.DownloadPreview(this, token, progress);
         }

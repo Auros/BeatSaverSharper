@@ -53,7 +53,7 @@ namespace BeatSaverSharp
 
         #region Beatmaps
 
-        public async Task<Beatmap?> Beatmap(string key, CancellationToken? token = null, bool skipCacheCheck = false)
+        public async Task<Beatmap?> Beatmap(string key, CancellationToken token = default, bool skipCacheCheck = false)
         {
             key = key.ToLowerInvariant();
             if (!skipCacheCheck && _fetchedBeatmaps.TryGetValue(key, out Beatmap? beatmap))
@@ -62,7 +62,7 @@ namespace BeatSaverSharp
             return await FetchBeatmap("maps/id/" + key, token);
         }
 
-        public async Task<Beatmap?> BeatmapByHash(string hash, CancellationToken? token = null, bool skipCacheCheck = false)
+        public async Task<Beatmap?> BeatmapByHash(string hash, CancellationToken token = default, bool skipCacheCheck = false)
         {
             hash = hash.ToUpperInvariant();
             if (string.IsNullOrWhiteSpace(hash))
@@ -74,7 +74,7 @@ namespace BeatSaverSharp
             return await FetchBeatmap("maps/hash/" + hash, token);
         }
 
-        private async Task<Beatmap?> FetchBeatmap(string url, CancellationToken? token = null)
+        private async Task<Beatmap?> FetchBeatmap(string url, CancellationToken token = default)
         {
             var response = await _httpService.GetAsync(url, token).ConfigureAwait(false);
             if (!response.Successful)
@@ -89,7 +89,7 @@ namespace BeatSaverSharp
 
         #region Paged Beatmaps
 
-        public async Task<Page?> LatestBeatmaps(UploadedFilterOptions? options = default, CancellationToken? token = null)
+        public async Task<Page?> LatestBeatmaps(UploadedFilterOptions? options = default, CancellationToken token = default)
         {
             if (options == null)
                 options = new UploadedFilterOptions(null, false);
@@ -109,7 +109,7 @@ namespace BeatSaverSharp
             };
         }
 
-        public async Task<Page?> UploaderBeatmaps(int uploaderID, int page = 0, CancellationToken? token = null)
+        public async Task<Page?> UploaderBeatmaps(int uploaderID, int page = 0, CancellationToken token = default)
         {
             var result = await GetBeatmapsFromPage($"maps/uploader/{uploaderID}/{page}", token).ConfigureAwait(false);
             if (result is null)
@@ -121,7 +121,7 @@ namespace BeatSaverSharp
             };
         }
 
-        public async Task<Page?> SearchBeatmaps(SearchTextFilterOption? searchOptions = default, int page = 0, CancellationToken? token = null)
+        public async Task<Page?> SearchBeatmaps(SearchTextFilterOption? searchOptions = default, int page = 0, CancellationToken token = default)
         {
             string searchURL = $"search/text/{page}";
 
@@ -163,7 +163,7 @@ namespace BeatSaverSharp
 
         #region Users
 
-        public async Task<User?> User(int id, CancellationToken? token = null, bool skipCacheCheck = false)
+        public async Task<User?> User(int id, CancellationToken token = default, bool skipCacheCheck = false)
         {
             if (!skipCacheCheck && _fetchedUsers.TryGetValue(id, out User? user))
             {
@@ -180,7 +180,7 @@ namespace BeatSaverSharp
             return user;
         }
 
-        public async Task<User?> User(string name, CancellationToken? token = null, bool skipCacheCheck = false)
+        public async Task<User?> User(string name, CancellationToken token = default, bool skipCacheCheck = false)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return null;
@@ -221,7 +221,7 @@ namespace BeatSaverSharp
         /// <param name="proof">The proof (secret, auth ticket, etc) which can be used to verify people.</param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task<VoteResponse> Vote(string levelHash, Vote.Type voteType, Vote.Platform platform, string platformID, string proof, CancellationToken? token = null)
+        public async Task<VoteResponse> Vote(string levelHash, Vote.Type voteType, Vote.Platform platform, string platformID, string proof, CancellationToken token = default)
         {
             var vote = new Vote(levelHash, voteType, platform, platformID, proof);
             var response = await _httpService.PostAsync("/vote", vote, token);
@@ -234,7 +234,7 @@ namespace BeatSaverSharp
 
         #region Byte Fetching
 
-        internal async Task<byte[]?> DownloadZIP(BeatmapVersion version, CancellationToken? token = null, IProgress<double>? progress = null)
+        internal async Task<byte[]?> DownloadZIP(BeatmapVersion version, CancellationToken token = default, IProgress<double>? progress = null)
         {
             var response = await _httpService.GetAsync(version.DownloadURL, token, progress).ConfigureAwait(false);
             if (!response.Successful)
@@ -242,7 +242,7 @@ namespace BeatSaverSharp
             return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
 
-        internal async Task<byte[]?> DownloadCoverImage(BeatmapVersion version, CancellationToken? token = null, IProgress<double>? progress = null)
+        internal async Task<byte[]?> DownloadCoverImage(BeatmapVersion version, CancellationToken token = default, IProgress<double>? progress = null)
         {
             var response = await _httpService.GetAsync(version.CoverURL, token, progress).ConfigureAwait(false);
             if (!response.Successful)
@@ -250,7 +250,7 @@ namespace BeatSaverSharp
             return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
 
-        internal async Task<byte[]?> DownloadPreview(BeatmapVersion version, CancellationToken? token = null, IProgress<double>? progress = null)
+        internal async Task<byte[]?> DownloadPreview(BeatmapVersion version, CancellationToken token = default, IProgress<double>? progress = null)
         {
             var response = await _httpService.GetAsync(version.PreviewURL, token, progress).ConfigureAwait(false);
             if (!response.Successful)
@@ -260,7 +260,7 @@ namespace BeatSaverSharp
 
         #endregion
 
-        private async Task<IReadOnlyList<Beatmap>?> GetBeatmapsFromPage(string url, CancellationToken? token = null)
+        private async Task<IReadOnlyList<Beatmap>?> GetBeatmapsFromPage(string url, CancellationToken token = default)
         {
             var response = await _httpService.GetAsync(url, token).ConfigureAwait(false);
             if (!response.Successful)

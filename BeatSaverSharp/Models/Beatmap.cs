@@ -126,7 +126,7 @@ namespace BeatSaverSharp.Models
             }
         }
 
-        public Task Refresh(CancellationToken? token = null)
+        public Task Refresh(CancellationToken token = default)
         {
             return Client.Beatmap(ID, token, true);
         }
