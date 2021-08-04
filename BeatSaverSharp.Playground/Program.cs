@@ -13,12 +13,11 @@ namespace BeatSaverSharp.Playground
         {
             using BeatSaver beatSaver = new();
 
-            var oddloop = await beatSaver.UploaderBeatmaps(1071);
-            var oddloop2 = await oddloop.Next();
-            var oddloopPrevious = await oddloop2.Previous();
-            Console.WriteLine(oddloop.Beatmaps[0].Name);
-            Console.WriteLine(oddloop2.Beatmaps[0].Name);
-            Console.WriteLine(oddloopPrevious.Beatmaps[0].Name);
+            var maps = await beatSaver.SearchBeatmaps(new SearchTextFilterOption
+            {
+                NoodleExtensions = true,
+                SortOrder = SortingOptions.Rating,
+            });
         }
     }
 }

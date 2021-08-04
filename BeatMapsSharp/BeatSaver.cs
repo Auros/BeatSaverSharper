@@ -5,6 +5,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,8 +17,22 @@ namespace BeatMapsSharp
     {
         internal bool IsDisposed { get; set; }
         private readonly IHttpService _httpService;
+        private static readonly (string, PropertyInfo)[] _filterProperties;
         private readonly ConcurrentDictionary<string, Beatmap> _fetchedBeatmaps = new ConcurrentDictionary<string, Beatmap>();
         private readonly ConcurrentDictionary<string, Beatmap> _fetchedHashedBeatmaps = new ConcurrentDictionary<string, Beatmap>();
+
+        static BeatSaver()
+        {
+            // We cache the reflection properties and their names.
+            var properties = typeof(SearchTextFilterOption).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            _filterProperties = new (string, PropertyInfo)[properties.Length];
+            for (int i = 0; i < properties.Length; i++)
+            {
+                var activeProperty = properties[i];
+                var queryKeyName = activeProperty.GetCustomAttribute<SearchTextFilterOption.QueryKeyNameAttribute>();
+                _filterProperties[i] = (queryKeyName?.Name ?? activeProperty.Name, activeProperty);
+            }
+        }
 
         public BeatSaver()
         {
@@ -59,7 +75,7 @@ namespace BeatMapsSharp
 
         #region Paged Beatmaps
 
-        public async Task<Page?> LatestBeatmaps(LatestFilterOptions options = default, CancellationToken? token = null)
+        public async Task<Page?> UploadedBeatmaps(UploadedFilterOptions options = default, CancellationToken? token = null)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("maps/latest?automapper=");
@@ -71,7 +87,7 @@ namespace BeatMapsSharp
             if (result is null)
                 return null;
 
-            return new UploadedPage(options, result)
+            return new UploadedPage(ref options, result)
             {
                 Client = this
             };
@@ -84,6 +100,45 @@ namespace BeatMapsSharp
                 return null;
 
             return new UploaderPage(page, uploaderID, result)
+            {
+                Client = this
+            };
+        }
+
+        public async Task<Page?> SearchBeatmaps(SearchTextFilterOption? searchOptions = default, int page = 0, CancellationToken? token = null)
+        {
+            string searchURL = $"search/text/{page}";
+
+            if (searchOptions != null)
+            {
+                List<string> queryProps = new List<string>();
+                foreach (var property in _filterProperties)
+                {
+                    var filterValue = property.Item2.GetValue(searchOptions);
+                    if (filterValue != null)
+                    {
+                        // DateTimes need to be formatted to conform to ISO
+                        if (filterValue is DateTime dateTime)
+                            filterValue = dateTime.ToString("O");
+                        queryProps.Add($"{property.Item1}={filterValue}");
+                    }
+                }
+
+                // Aggregating an empty list == exception 
+                if (queryProps.Count != 0)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append('?').Append(queryProps.Aggregate((a, b) => $"{a}&{b}"));
+                    searchURL += sb.ToString();
+                }
+            }
+            Console.WriteLine(searchURL);
+
+            var result = await GetBeatmapsFromPage(searchURL, token);
+            if (result is null)
+                return null;
+
+            return new SearchPage(page, searchOptions, result)
             {
                 Client = this
             };

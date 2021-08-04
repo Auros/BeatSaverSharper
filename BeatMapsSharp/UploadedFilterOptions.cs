@@ -5,7 +5,7 @@ namespace BeatMapsSharp
     /// <summary>
     /// Provides options for filtering BeatSaver by Latest
     /// </summary>
-    public struct LatestFilterOptions
+    public struct UploadedFilterOptions
     {
         /// <summary>
         /// Start searching for songs that released before or during this date.
@@ -17,7 +17,7 @@ namespace BeatMapsSharp
         /// </summary>
         public bool IncludeAutomappers { get; }
 
-        public LatestFilterOptions(DateTime? startDate, bool includeAutomappers)
+        public UploadedFilterOptions(DateTime? startDate, bool includeAutomappers)
         {
             StartDate = startDate;
             IncludeAutomappers = includeAutomappers;
