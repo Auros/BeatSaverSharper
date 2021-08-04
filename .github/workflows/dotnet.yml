@@ -26,7 +26,7 @@ jobs:
     - name: Publish
       run: dontnet publish --framework netstandard2.0 --configuration Release --no-restore
     - name: Upload
-      uses: actions/upload-artifacts/@v2
+      uses: actions/upload-artifact@v2
       with:
         name: BeatSaverSharp
         path: BeatSaverSharp/bin/Release/netstandard2.0/publish
