@@ -1,7 +1,12 @@
 ﻿using BeatMapsSharp.Http;
 using BeatMapsSharp.Models;
+using BeatMapsSharp.Models.Pages;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,6 +23,8 @@ namespace BeatMapsSharp
         {
             _httpService = new HttpClientService("https://beatmaps.io/api/", TimeSpan.FromSeconds(30), "BeatSaverSharp/3.0.0");
         }
+
+        #region Beatmaps
 
         public async Task<Beatmap?> Beatmap(string key, CancellationToken? token = null)
         {
@@ -45,31 +52,84 @@ namespace BeatMapsSharp
                 return null;
 
             Beatmap beatmap = await response.ReadAsObjectAsync<Beatmap>();
+            GetOrAddBeatmapToCache(beatmap, out beatmap);
+            return beatmap;
+        }
+
+        #endregion
+
+        #region Paged Beatmaps
+
+        public async Task<Page?> Latest(LatestFilterOptions options = default, CancellationToken? token = null)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("maps/latest?automapper=");
+            sb.Append(options.IncludeAutomappers);
+            if (options.StartDate.HasValue)
+                sb.Append("&after=").Append(options.StartDate.Value.ToString("O"));
+
+            var result = await GetBeatmapsFromPage(sb.ToString(), token).ConfigureAwait(false);
+            if (result is null)
+                return null;
+
+            return new LatestPage(options, result)
+            {
+                Client = this
+            };
+        }
+
+        #endregion
+
+        private async Task<IReadOnlyList<Beatmap>?> GetBeatmapsFromPage(string url, CancellationToken? token = null)
+        {
+            var response = await _httpService.GetAsync(url, token).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+
+            var page = await response.ReadAsObjectAsync<SerializablePage>();
+            if (page.Docs.Count == 0)
+                return null;
+
+            // We do this so there's only one source of a Beatmap object that exists
+            // This way, Beatmaps will constantly have their properties updated as soon
+            // as something else sees a newer version of it.
+            List<Beatmap> beatmapList = new List<Beatmap>();
+            foreach (var beatmap in page.Docs)
+            {
+                GetOrAddBeatmapToCache(beatmap, out Beatmap selfOrCached);
+                beatmapList.Add(selfOrCached);
+            }
+
+            return new ReadOnlyCollection<Beatmap>(beatmapList);
+        }
+
+        /// <summary>
+        /// Gets or adds a map to the cache. This will give the beatmap properties their client object if necessary.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to get or add.</param>
+        /// <param name="cachedAndOrBeatmap">The added or fetched Beatmap</param>
+        /// <returns>Returns true if it was added. Returns false if it was already cached.</returns>
+        private bool GetOrAddBeatmapToCache(Beatmap beatmap, out Beatmap cachedAndOrBeatmap)
+        {
             if (_fetchedBeatmaps.TryGetValue(beatmap.ID, out Beatmap? cachedBeatmap))
             {
                 // TODO: Refresh beatmap, probably.
-                return cachedBeatmap;
+                cachedAndOrBeatmap = cachedBeatmap;
+                return false;
             }
             else
             {
                 _fetchedBeatmaps.TryAdd(beatmap.ID, beatmap);
-            }
-            
-            foreach (var version in beatmap.Versions)
-            {
-                if (_fetchedHashedBeatmaps.TryGetValue(version.Hash, out cachedBeatmap))
-                {
-                    // TODO: Refresh beatmap, probably.
-                    return cachedBeatmap;
-                }
-                else
+                cachedAndOrBeatmap = beatmap;
+
+                foreach (var version in beatmap.Versions)
                 {
                     _fetchedHashedBeatmaps.TryAdd(version.Hash, beatmap);
                 }
+
+                PopulateWithClient(cachedAndOrBeatmap);
+                return true;
             }
-            
-            PopulateWithClient(beatmap);
-            return beatmap;
         }
 
         private void PopulateWithClient(Beatmap beatmap)

@@ -1,4 +1,8 @@
 ﻿using BeatMapsSharp;
+using BeatMapsSharp.Models.Pages;
+using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Threading.Tasks;
 
 // This project is a development project as I work on BeatSaverSharp v3.
@@ -11,12 +15,16 @@ namespace BeatSaverSharp.Playground
         public static async Task Main(string[] args)
         {
             using BeatSaver beatSaver = new();
-
-            var makeAWish = await beatSaver.BeatmapByHash("e8c771635e9f2eaad953972a7453bb3469e86038");
-            _ = makeAWish;
-
-            makeAWish = await beatSaver.Beatmap("1a32d");
-            _ = makeAWish;
+            
+            var page = await beatSaver.Latest();
+            _ = page;
+            var page2 = await page.Next();
+            _ = page2;
+            var page3 = await page2.Next();
+            _ = page3;
+            var page2Again = await page3.Previous();
+            _ = page2Again;
+            
         }
     }
 }

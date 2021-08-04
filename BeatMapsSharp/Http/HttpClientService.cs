@@ -56,7 +56,7 @@ namespace BeatMapsSharp.Http
                 if (length.HasValue)
                     progress?.Report((double)total / length.Value);
 
-                await ms.WriteAsync(buffer).ConfigureAwait(false);
+                await ms.WriteAsync(buffer, 0, read).ConfigureAwait(false);
                 total += read;
             }
             progress?.Report(1);

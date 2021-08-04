@@ -67,7 +67,7 @@ namespace BeatMapsSharp.Models
         /// The time at which this map was uploaded.
         /// </summary>
         [JsonProperty("uploaded")]
-        public DateTime? Uploaded { get; internal set; }
+        public DateTime Uploaded { get; internal set; }
 
         /// <summary>
         /// The uploader of this map.

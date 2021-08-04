@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +15,7 @@ namespace BeatMapsSharp.Http
         private byte[]? _bytes;
         private string? _bodyAsString;
         private readonly HttpResponseMessage _httpResponseMessage;
+        private static readonly JsonSerializer _jsonSerializer = new JsonSerializer();
 
         public HttpClientResponse(HttpResponseMessage httpResponseMessage)
         {
@@ -45,7 +48,9 @@ namespace BeatMapsSharp.Http
 
         public async Task<T> ReadAsObjectAsync<T>() where T : class
         {
-            return JsonConvert.DeserializeObject<T>(await ReadAsStringAsync())!;
+            using StringReader reader = new StringReader(await ReadAsStringAsync());
+            using JsonTextReader jsonTextReader = new JsonTextReader(reader);
+            return _jsonSerializer.Deserialize<T>(jsonTextReader)!;
         }
     }
 }
