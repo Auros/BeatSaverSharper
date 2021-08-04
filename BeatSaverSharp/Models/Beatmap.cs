@@ -83,6 +83,49 @@ namespace BeatSaverSharp.Models
         [JsonProperty("curator")]
         public string? Curator { get; internal set; }
 
+        private BeatmapVersion? _latestVersion;
+
+        // Fetches the latest version ordered by creation date.
+        // If there's only one version, that version becomes the latest.
+        [JsonIgnore]
+        public BeatmapVersion LatestVersion
+        {
+            get
+            {
+                if (_latestVersion is null)
+                {
+                    if (Versions.Count == 1)
+                    {
+                        _latestVersion = Versions[0];
+                        return _latestVersion;
+                    }
+
+                    BeatmapVersion? latest = null;
+                    for (int i = 0; i < Versions.Count; i++)
+                    {
+                        var active = Versions[i];
+                        if (latest is null)
+                        {
+                            latest = active;
+                        }
+                        else
+                        {
+                            if (active.CreatedAt > latest.CreatedAt)
+                            {
+                                latest = active;
+                            }
+                        }
+                    }
+                    _latestVersion = latest;
+                }
+                return _latestVersion!;
+            }
+            internal set
+            {
+                _latestVersion = value;
+            }
+        }
+
         public Task Refresh(CancellationToken? token = null)
         {
             return Client.Beatmap(ID, token, true);

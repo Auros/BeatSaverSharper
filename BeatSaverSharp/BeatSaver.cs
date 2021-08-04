@@ -312,6 +312,8 @@ namespace BeatSaverSharp
                 if (beatmap.Uploaded != cachedBeatmap.Uploaded)
                     cachedBeatmap.Uploaded = beatmap.Uploaded;
 
+                // Setting it to null will cause the LatestVersion property to revalidate the next time it's called.
+                cachedBeatmap.LatestVersion = null!;
                 cachedBeatmap.Versions = beatmap.Versions;
                 PopulateWithClient(cachedBeatmap);
 
