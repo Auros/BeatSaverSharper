@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BeatMapsSharp.Exceptions
+namespace BeatSaverSharp.Exceptions
 {
     public class BeatSaverClientDisposedException : Exception
     {

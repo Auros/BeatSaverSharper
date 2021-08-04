@@ -1,6 +1,6 @@
-﻿using BeatMapsSharp.Http;
-using BeatMapsSharp.Models;
-using BeatMapsSharp.Models.Pages;
+﻿using BeatSaverSharp.Http;
+using BeatSaverSharp.Models;
+using BeatSaverSharp.Models.Pages;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BeatMapsSharp
+namespace BeatSaverSharp
 {
     public class BeatSaver : IDisposable
     {
@@ -214,7 +214,7 @@ namespace BeatMapsSharp
             var vote = new Vote(levelHash, voteType, platform, platformID, proof);
             var response = await _httpService.PostAsync("/vote", vote, token);
             if (!response.Successful)
-                return new VoteResponse { Successful = false, Error = $"{nameof(BeatMapsSharp)}: Unknown" };
+                return new VoteResponse { Successful = false, Error = $"{nameof(BeatSaverSharp)}: Unknown" };
             return await response.ReadAsObjectAsync<VoteResponse>();
         }
 

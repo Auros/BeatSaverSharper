@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace BeatMapsSharp.Models
+namespace BeatSaverSharp.Models
 {
     /// <summary>
     /// Represents a specific version of a Beatmap

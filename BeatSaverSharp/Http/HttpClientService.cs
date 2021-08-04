@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BeatMapsSharp.Http
+namespace BeatSaverSharp.Http
 {
     internal class HttpClientService : IHttpService, IDisposable
     {

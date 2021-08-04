@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BeatMapsSharp\BeatMapsSharp.csproj" />
+    <ProjectReference Include="..\BeatSaverSharp\BeatSaverSharp.csproj" />
   </ItemGroup>
 
 </Project>

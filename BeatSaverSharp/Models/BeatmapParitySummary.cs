@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace BeatMapsSharp.Models
+namespace BeatSaverSharp.Models
 {
     /// <summary>
     /// Contains parity information of a beatmap.

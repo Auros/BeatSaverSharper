@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 
-namespace BeatMapsSharp.Models.Pages
+namespace BeatSaverSharp.Models.Pages
 {
     internal class SerializableSearch
     {

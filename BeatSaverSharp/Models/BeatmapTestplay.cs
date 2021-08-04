@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace BeatMapsSharp.Models
+namespace BeatSaverSharp.Models
 {
     /// <summary>
     /// Represents a playtest of a beatmap.

@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace BeatMapsSharp.Http
+namespace BeatSaverSharp.Http
 {
     public interface IHttpService
     {

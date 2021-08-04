@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeatMapsSharp.Http
+namespace BeatSaverSharp.Http
 {
     internal class HttpClientResponse : IHttpResponse
     {

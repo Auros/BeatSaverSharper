@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace BeatMapsSharp.Models
+namespace BeatSaverSharp.Models
 {
     /// <summary>
     /// Contains statistics containing the quantity of maps a user has uploaded.

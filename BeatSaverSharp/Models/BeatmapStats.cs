@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace BeatMapsSharp.Models
+namespace BeatSaverSharp.Models
 {
     public class BeatmapStats
     {

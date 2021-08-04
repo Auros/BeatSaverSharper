@@ -1,6 +1,6 @@
-﻿using BeatMapsSharp.Exceptions;
+﻿using BeatSaverSharp.Exceptions;
 
-namespace BeatMapsSharp
+namespace BeatSaverSharp
 {
     public abstract class BeatSaverObject
     {

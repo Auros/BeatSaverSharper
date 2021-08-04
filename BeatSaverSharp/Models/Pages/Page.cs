@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BeatMapsSharp.Models.Pages
+namespace BeatSaverSharp.Models.Pages
 {
     public abstract class Page : BeatSaverObject
     {

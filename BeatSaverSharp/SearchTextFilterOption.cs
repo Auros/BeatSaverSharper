@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BeatMapsSharp
+namespace BeatSaverSharp
 {
     /// <summary>
     /// Options for filtering through BeatSaver. All properties are nullable by default. Setting one to a value

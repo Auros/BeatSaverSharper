@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BeatMapsSharp
+namespace BeatSaverSharp
 {
     /// <summary>
     /// Provides options for filtering BeatSaver by Latest

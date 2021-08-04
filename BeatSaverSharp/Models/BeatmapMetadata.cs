@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace BeatMapsSharp.Models
+namespace BeatSaverSharp.Models
 {
     /// <summary>
     /// Contains map detail metadata. The information stored here is inferred from map's Info.dat file.

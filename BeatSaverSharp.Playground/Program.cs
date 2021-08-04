@@ -1,4 +1,4 @@
-﻿using BeatMapsSharp;
+﻿using BeatSaverSharp;
 using System;
 using System.Threading.Tasks;
 

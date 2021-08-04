@@ -1,4 +1,4 @@
-﻿namespace BeatMapsSharp
+﻿namespace BeatSaverSharp
 {
     public enum SortingOptions
     {
