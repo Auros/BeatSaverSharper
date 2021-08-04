@@ -88,6 +88,21 @@ namespace BeatSaverSharp.Models
             return Client.Vote(Hash, voteType, platform, platformID, proof, token);
         }
 
+        public Task<byte[]?> DownloadZIP(CancellationToken? token = null, IProgress<double>? progress = null)
+        {
+            return Client.DownloadZIP(this, token, progress);
+        }
+
+        public Task<byte[]?> DownloadCoverImage(CancellationToken? token = null, IProgress<double>? progress = null)
+        {
+            return Client.DownloadCoverImage(this, token, progress);
+        }
+
+        public Task<byte[]?> DownloadPreview(CancellationToken? token = null, IProgress<double>? progress = null)
+        {
+            return Client.DownloadPreview(this, token, progress);
+        }
+
         // Equality Methods
 
         public bool Equals(BeatmapVersion? other) => Hash == other?.Hash;

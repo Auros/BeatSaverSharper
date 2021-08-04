@@ -36,9 +36,14 @@ namespace BeatSaverSharp
             }
         }
 
-        public BeatSaver()
+        public BeatSaver(BeatSaverOptions beatSaverOptions)
         {
-            _httpService = new HttpClientService("https://beatmaps.io/api/", TimeSpan.FromSeconds(30), "BeatSaverSharp/3.0.0");
+            _httpService = new HttpClientService(beatSaverOptions.BeatSaverAPI.ToString(), beatSaverOptions.Timeout, $"{beatSaverOptions.ApplicationName}/{beatSaverOptions.Version}");
+        }
+
+        public BeatSaver(string applicationName, Version version) : this(new BeatSaverOptions(applicationName, version))
+        {
+
         }
 
         #region Beatmaps
@@ -215,6 +220,34 @@ namespace BeatSaverSharp
             if (!response.Successful)
                 return new VoteResponse { Successful = false, Error = $"{nameof(BeatSaverSharp)}: Unknown" };
             return await response.ReadAsObjectAsync<VoteResponse>();
+        }
+
+        #endregion
+
+        #region Byte Fetching
+
+        internal async Task<byte[]?> DownloadZIP(BeatmapVersion version, CancellationToken? token = null, IProgress<double>? progress = null)
+        {
+            var response = await _httpService.GetAsync(version.DownloadURL, token, progress).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+            return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
+        }
+
+        internal async Task<byte[]?> DownloadCoverImage(BeatmapVersion version, CancellationToken? token = null, IProgress<double>? progress = null)
+        {
+            var response = await _httpService.GetAsync(version.CoverURL, token, progress).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+            return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
+        }
+
+        internal async Task<byte[]?> DownloadPreview(BeatmapVersion version, CancellationToken? token = null, IProgress<double>? progress = null)
+        {
+            var response = await _httpService.GetAsync(version.PreviewURL, token, progress).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+            return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
 
         #endregion
