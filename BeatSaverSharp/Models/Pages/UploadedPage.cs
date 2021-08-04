@@ -9,7 +9,7 @@ namespace BeatSaverSharp.Models.Pages
         private Page? PreviousPage { get; set; }
         private readonly UploadedFilterOptions _query;
         
-        public UploadedPage(ref UploadedFilterOptions query, IReadOnlyList<Beatmap> beatmaps, Page? previousPage = null) : base(beatmaps)
+        public UploadedPage(UploadedFilterOptions query, IReadOnlyList<Beatmap> beatmaps, Page? previousPage = null) : base(beatmaps)
         {
             _query = query;
             PreviousPage = previousPage;
@@ -22,7 +22,7 @@ namespace BeatSaverSharp.Models.Pages
 
             Beatmap oldest = Beatmaps[Beatmaps.Count - 1];
             UploadedFilterOptions options = new UploadedFilterOptions(oldest.Uploaded, _query.IncludeAutomappers);
-            var nextPage = await Client.UploadedBeatmaps(options, token).ConfigureAwait(false);
+            var nextPage = await Client.LatestBeatmaps(options, token).ConfigureAwait(false);
             if (nextPage is UploadedPage nextLatest)
                 nextLatest.PreviousPage = this;
             return nextPage;

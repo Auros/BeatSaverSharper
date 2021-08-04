@@ -17,6 +17,8 @@ namespace BeatSaverSharp
     {
         internal bool IsDisposed { get; set; }
         private readonly IHttpService _httpService;
+        private readonly object _bLock = new object();
+        private readonly object _uLock = new object();
         private static readonly (string, PropertyInfo)[] _filterProperties;
         private readonly ConcurrentDictionary<int, User> _fetchedUsers = new ConcurrentDictionary<int, User>();
         private readonly ConcurrentDictionary<string, User> _fetchedUsernames = new ConcurrentDictionary<string, User>();
@@ -84,19 +86,21 @@ namespace BeatSaverSharp
 
         #region Paged Beatmaps
 
-        public async Task<Page?> UploadedBeatmaps(UploadedFilterOptions options = default, CancellationToken? token = null)
+        public async Task<Page?> LatestBeatmaps(UploadedFilterOptions? options = default, CancellationToken? token = null)
         {
+            if (options == null)
+                options = new UploadedFilterOptions(null, false);
             StringBuilder sb = new StringBuilder();
             sb.Append("maps/latest?automapper=");
             sb.Append(options.IncludeAutomappers);
             if (options.StartDate.HasValue)
-                sb.Append("&after=").Append(options.StartDate.Value.ToString("O"));
+                sb.Append("&after=").Append(options.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
 
             var result = await GetBeatmapsFromPage(sb.ToString(), token).ConfigureAwait(false);
             if (result is null)
                 return null;
 
-            return new UploadedPage(ref options, result)
+            return new UploadedPage(options, result)
             {
                 Client = this
             };
@@ -128,7 +132,7 @@ namespace BeatSaverSharp
                     {
                         // DateTimes need to be formatted to conform to ISO
                         if (filterValue is DateTime dateTime)
-                            filterValue = dateTime.ToString("O");
+                            filterValue = dateTime.ToString("yyyy-MM-ddTHH:mm:ssZ"); // yyyy-MM-dd
                         queryProps.Add($"{property.Item1}={filterValue}");
                     }
                 }
@@ -283,93 +287,112 @@ namespace BeatSaverSharp
         /// <returns>Returns true if it was added. Returns false if it was already cached.</returns>
         private bool GetOrAddBeatmapToCache(Beatmap beatmap, out Beatmap cachedAndOrBeatmap)
         {
-            if (_fetchedBeatmaps.TryGetValue(beatmap.ID, out Beatmap? cachedBeatmap))
+            lock (_bLock)
             {
-                if (beatmap.Automapper != cachedBeatmap.Automapper)
-                    cachedBeatmap.Automapper = beatmap.Automapper;
-
-                if (beatmap.Curator != cachedBeatmap.Curator)
-                    cachedBeatmap.Curator = beatmap.Curator;
-
-                if (beatmap.Description != cachedBeatmap.Description)
-                    cachedBeatmap.Description = beatmap.Description;
-
-                if (beatmap.Metadata != cachedBeatmap.Metadata)
-                    cachedBeatmap.Metadata = beatmap.Metadata;
-
-                if (beatmap.Name != cachedBeatmap.Name)
-                    cachedBeatmap.Name = beatmap.Name;
-
-                if (beatmap.Qualified != cachedBeatmap.Qualified)
-                    cachedBeatmap.Qualified = beatmap.Qualified;
-
-                if (beatmap.Ranked != cachedBeatmap.Ranked)
-                    cachedBeatmap.Ranked = beatmap.Ranked;
-
-                if (beatmap.Stats != cachedBeatmap.Stats)
-                    cachedBeatmap.Stats = beatmap.Stats;
-
-                if (beatmap.Uploaded != cachedBeatmap.Uploaded)
-                    cachedBeatmap.Uploaded = beatmap.Uploaded;
-
-                // Setting it to null will cause the LatestVersion property to revalidate the next time it's called.
-                cachedBeatmap.LatestVersion = null!;
-                cachedBeatmap.Versions = beatmap.Versions;
-                PopulateWithClient(cachedBeatmap);
-
-                cachedAndOrBeatmap = cachedBeatmap;
-                return false;
-            }
-            else
-            {
-                _fetchedBeatmaps.TryAdd(beatmap.ID, beatmap);
-                cachedAndOrBeatmap = beatmap;
-
-                foreach (var version in beatmap.Versions)
+                if (_fetchedBeatmaps.TryGetValue(beatmap.ID, out Beatmap? cachedBeatmap))
                 {
-                    _fetchedHashedBeatmaps.TryAdd(version.Hash, beatmap);
-                }
+                    if (beatmap.Automapper != cachedBeatmap.Automapper)
+                        cachedBeatmap.Automapper = beatmap.Automapper;
 
-                PopulateWithClient(cachedAndOrBeatmap);
-                return true;
+                    if (beatmap.Curator != cachedBeatmap.Curator)
+                        cachedBeatmap.Curator = beatmap.Curator;
+
+                    if (beatmap.Description != cachedBeatmap.Description)
+                        cachedBeatmap.Description = beatmap.Description;
+
+                    if (beatmap.Metadata != cachedBeatmap.Metadata)
+                        cachedBeatmap.Metadata = beatmap.Metadata;
+
+                    if (beatmap.Name != cachedBeatmap.Name)
+                        cachedBeatmap.Name = beatmap.Name;
+
+                    if (beatmap.Qualified != cachedBeatmap.Qualified)
+                        cachedBeatmap.Qualified = beatmap.Qualified;
+
+                    if (beatmap.Ranked != cachedBeatmap.Ranked)
+                        cachedBeatmap.Ranked = beatmap.Ranked;
+
+                    if (beatmap.Stats != cachedBeatmap.Stats)
+                        cachedBeatmap.Stats = beatmap.Stats;
+
+                    if (beatmap.Uploaded != cachedBeatmap.Uploaded)
+                        cachedBeatmap.Uploaded = beatmap.Uploaded;
+
+                    // Setting it to null will cause the LatestVersion property to revalidate the next time it's called.
+                    cachedBeatmap.LatestVersion = null!;
+                    cachedBeatmap.Versions = beatmap.Versions;
+                    PopulateWithClient(cachedBeatmap);
+
+                    cachedAndOrBeatmap = cachedBeatmap;
+                    return false;
+                }
+                else
+                {
+                    _fetchedBeatmaps.TryAdd(beatmap.ID, beatmap);
+                    cachedAndOrBeatmap = beatmap;
+
+                    foreach (var version in beatmap.Versions)
+                    {
+                        _fetchedHashedBeatmaps.TryAdd(version.Hash, beatmap);
+                    }
+
+                    PopulateWithClient(cachedAndOrBeatmap);
+                    return true;
+                }
             }
         }
 
         private bool GetOrAddUserToCache(User user, out User cachedAndOrUser)
         {
-            if (_fetchedUsers.TryGetValue(user.ID, out User? cachedUser))
+            lock (_uLock)
             {
-                if (user.Hash != cachedUser.Hash)
-                    cachedUser.Hash = user.Hash;
-
-                if (user.Name != cachedUser.Name)
-                    cachedUser.Name = user.Name;
-
-                if (user.Avatar != cachedUser.Avatar)
-                    cachedUser.Avatar = user.Avatar;
-
-                // Update the stats field on any updated user objects.
-                if (user.Stats != null && cachedUser.Stats is null)
+                if (_fetchedUsers.TryGetValue(user.ID, out User? cachedUser))
                 {
-                    cachedUser.Stats = user.Stats;
-                }
-                else if (cachedUser.Stats != null)
-                {
-                    if (!cachedUser.Stats.Equals(user.Stats))
+                    if (user.Hash != cachedUser.Hash)
+                        cachedUser.Hash = user.Hash;
+
+                    if (user.Name != cachedUser.Name)
+                        cachedUser.Name = user.Name;
+
+                    if (user.Avatar != cachedUser.Avatar)
+                        cachedUser.Avatar = user.Avatar;
+
+                    // Update the stats field on any updated user objects.
+                    if (user.Stats != null && cachedUser.Stats is null)
+                    {
                         cachedUser.Stats = user.Stats;
+                    }
+                    else if (cachedUser.Stats != null)
+                    {
+                        if (!cachedUser.Stats.Equals(user.Stats))
+                            cachedUser.Stats = user.Stats;
+                    }
+                    cachedAndOrUser = cachedUser;
+                    return false;
                 }
-                cachedAndOrUser = cachedUser;
-                return false;
-            }
-            else
-            {
-                _fetchedUsers.TryAdd(user.ID, user);
-                cachedAndOrUser = user;
+                else
+                {
+                    string usernameLowercase = user.Name.ToLower();
+                    if (_fetchedUsernames.TryGetValue(usernameLowercase, out User? cachedUsername))
+                    {
+                        // If the stats object is NOT null, that means this is a complete user object and should be added to the ID cache.
+                        if (user.Stats != null)
+                        {
+                            cachedUsername.Stats = user.Stats;
+                            _fetchedUsers.TryAdd(user.ID, cachedUsername);
+                        }
+                        cachedAndOrUser = cachedUsername;
+                    }
+                    else
+                    {
+                        cachedAndOrUser = user;
+                        _fetchedUsernames.TryAdd(usernameLowercase, cachedAndOrUser);
+                    }
 
-                _fetchedUsernames.TryAdd(user.Name.ToLower(), user);
-                if (!user.HasClient)
-                    user.Client = this;
-                return true;
+                    if (!cachedAndOrUser.HasClient)
+                        cachedAndOrUser.Client = this;
+                    return true;
+                }
             }
         }
 

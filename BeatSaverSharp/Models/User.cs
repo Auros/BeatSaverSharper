@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BeatSaverSharp.Models.Pages;
+using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +45,16 @@ namespace BeatSaverSharp.Models
         {
             return Client.User(ID, token, true);
         }
+
+        /// <summary>
+        /// Gets the beatmaps uploaded by the user.
+        /// </summary>
+        /// <param name="page">The page to get/</param>
+        /// <returns></returns>
+        public Task<Page?> Beatmaps(int page = 0, CancellationToken? token = null)
+        {
+            return Client.UploaderBeatmaps(ID, page, token);
+        } 
 
         // Equality Methods
 

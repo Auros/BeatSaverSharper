@@ -6,7 +6,7 @@ namespace BeatSaverSharp
     {
         public Version Version { get; set; }
         public string ApplicationName { get; set; }
-        public Uri BeatSaverAPI { get; set; } = new Uri("https://beatmaps.io/api/");
+        public Uri BeatSaverAPI { get; set; } = new Uri("https://api.beatsaver.com/");
         public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(30);
 
         public BeatSaverOptions(string applicationName, string version) : this(applicationName, Version.Parse(version))

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeatSaverSharp.Playground",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeatSaverSharp", "BeatSaverSharp\BeatSaverSharp.csproj", "{333D2DB7-8187-4B05-948E-94B6C58BE848}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeatSaverSharp.Tests", "BeatSaverSharp.Tests\BeatSaverSharp.Tests.csproj", "{1503A7FB-2135-49D3-9B8D-31F377D571E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{333D2DB7-8187-4B05-948E-94B6C58BE848}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{333D2DB7-8187-4B05-948E-94B6C58BE848}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{333D2DB7-8187-4B05-948E-94B6C58BE848}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1503A7FB-2135-49D3-9B8D-31F377D571E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1503A7FB-2135-49D3-9B8D-31F377D571E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1503A7FB-2135-49D3-9B8D-31F377D571E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1503A7FB-2135-49D3-9B8D-31F377D571E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -25,14 +25,14 @@ namespace BeatSaverSharp
         }
 
         /// <summary>
-        /// Is a map not automatically generated?
+        /// Is a map automatically generated?
         /// </summary>
         /// <remarks>
-        /// If this property is set to false (aka, not True or Null), only automapped songs will be returned.
-        /// Why would you set this to false?
+        /// Setting this to null (default) will make it so only human-made maps are returned. Setting it to false will only return
+        /// auto-mapped songs. Setting it to true will include both.
         /// </remarks>
         [QueryKeyName("automapper")]
-        public bool? ExcludeAutomappers { get; set; }
+        public bool? IncludeAutomappers { get; set; }
 
         /// <summary>
         /// Does a map have Chroma effects?

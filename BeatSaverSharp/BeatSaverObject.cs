@@ -8,7 +8,7 @@ namespace BeatSaverSharp
 
         private BeatSaver _client = null!;
 
-        public BeatSaver Client
+        internal BeatSaver Client
         {
             get
             {
@@ -18,7 +18,7 @@ namespace BeatSaverSharp
                     throw new BeatSaverClientDisposedException();
                 return _client!;
             }
-            internal set => _client = value;
+            set => _client = value;
         }
     }
 }
