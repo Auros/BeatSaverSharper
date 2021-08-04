@@ -23,10 +23,8 @@ jobs:
       run: dotnet build --no-restore --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-build --configuration Release --verbosity normal
-    - name: Publish
-      run: dotnet publish --framework netstandard2.0 --configuration Release --no-restore
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
         name: BeatSaverSharp
-        path: BeatSaverSharp/bin/Release/netstandard2.0/publish
+        path: BeatSaverSharp/bin/Release/netstandard2.0
