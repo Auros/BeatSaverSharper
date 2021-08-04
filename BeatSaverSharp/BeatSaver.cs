@@ -136,7 +136,6 @@ namespace BeatSaverSharp
                     searchURL += sb.ToString();
                 }
             }
-            Console.WriteLine(searchURL);
 
             var result = await GetBeatmapsFromPage(searchURL, token);
             if (result is null)
