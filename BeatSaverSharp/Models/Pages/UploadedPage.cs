@@ -20,7 +20,7 @@ namespace BeatSaverSharp.Models.Pages
             if (Beatmaps.Count == 0)
                 return null;
 
-            Beatmap oldest = Beatmaps[^1];
+            Beatmap oldest = Beatmaps[Beatmaps.Count - 1];
             UploadedFilterOptions options = new UploadedFilterOptions(oldest.Uploaded, _query.IncludeAutomappers);
             var nextPage = await Client.UploadedBeatmaps(options, token).ConfigureAwait(false);
             if (nextPage is UploadedPage nextLatest)

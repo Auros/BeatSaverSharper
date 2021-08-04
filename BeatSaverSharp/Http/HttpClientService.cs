@@ -46,7 +46,7 @@ namespace BeatSaverSharp.Http
 
             while (true)
             {
-                int read = await streamedBody.ReadAsync(buffer).ConfigureAwait(false);
+                int read = await streamedBody.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
                 if (read <= 0)
                     break;
 
