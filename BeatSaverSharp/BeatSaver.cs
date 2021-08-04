@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace BeatSaverSharp
 {
+    /// <summary>
+    /// A client for interfacing with the BeatSaver API
+    /// </summary>
     public class BeatSaver : IDisposable
     {
         internal bool IsDisposed { get; set; }
@@ -216,6 +219,7 @@ namespace BeatSaverSharp
         /// <param name="platform">The platform in which the vote is coming from. This should be related to the <paramref name="platformID"/></param>
         /// <param name="platformID">The platform ID of the user submitting this vote. This should correspond to <paramref name="platform"/></param>
         /// <param name="proof">The proof (secret, auth ticket, etc) which can be used to verify people.</param>
+        /// <param name="token"></param>
         /// <returns></returns>
         public async Task<VoteResponse> Vote(string levelHash, Vote.Type voteType, Vote.Platform platform, string platformID, string proof, CancellationToken? token = null)
         {

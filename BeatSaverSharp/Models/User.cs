@@ -50,6 +50,7 @@ namespace BeatSaverSharp.Models
         /// Gets the beatmaps uploaded by the user.
         /// </summary>
         /// <param name="page">The page to get/</param>
+        /// <param name="token"></param>
         /// <returns></returns>
         public Task<Page?> Beatmaps(int page = 0, CancellationToken? token = null)
         {
