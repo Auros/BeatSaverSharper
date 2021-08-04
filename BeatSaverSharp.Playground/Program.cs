@@ -13,11 +13,12 @@ namespace BeatSaverSharp.Playground
         {
             using BeatSaver beatSaver = new();
 
-            var maps = await beatSaver.SearchBeatmaps(new SearchTextFilterOption
-            {
-                NoodleExtensions = true,
-                SortOrder = SortingOptions.Rating,
-            });
+            var autos = await beatSaver.User("auros");
+            _ = autos;
+
+            var auros = await beatSaver.User(4284385);
+            _ = auros;
+            _ = autos;
         }
     }
 }

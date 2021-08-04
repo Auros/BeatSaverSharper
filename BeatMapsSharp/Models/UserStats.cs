@@ -67,5 +67,40 @@ namespace BeatMapsSharp.Models
         /// </summary>
         [JsonProperty("totalUpvotes")]
         public int TotalUpvotes { get; internal set; }
+
+        public bool Equals(UserStats? other)
+        {
+            if (other is null)
+                return false;
+
+            if (AverageBPM != other.AverageBPM)
+                return false;
+
+            if (AverageDuration != other.AverageDuration)
+                return false;
+
+            if (AverageScore != other.AverageScore)
+                return false;
+
+            if (FirstUpload != other.FirstUpload)
+                return false;
+
+            if (LastUpload != other.LastUpload)
+                return false;
+
+            if (RankedMaps != other.RankedMaps)
+                return false;
+
+            if (TotalDownvotes != other.TotalDownvotes)
+                return false;
+
+            if (TotalMaps != other.TotalMaps)
+                return false;
+
+            if (TotalUpvotes != other.TotalUpvotes)
+                return false;
+
+            return true;
+        }
     }
 }

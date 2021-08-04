@@ -18,6 +18,8 @@ namespace BeatMapsSharp
         internal bool IsDisposed { get; set; }
         private readonly IHttpService _httpService;
         private static readonly (string, PropertyInfo)[] _filterProperties;
+        private readonly ConcurrentDictionary<int, User> _fetchedUsers = new ConcurrentDictionary<int, User>();
+        private readonly ConcurrentDictionary<string, User> _fetchedUsernames = new ConcurrentDictionary<string, User>();
         private readonly ConcurrentDictionary<string, Beatmap> _fetchedBeatmaps = new ConcurrentDictionary<string, Beatmap>();
         private readonly ConcurrentDictionary<string, Beatmap> _fetchedHashedBeatmaps = new ConcurrentDictionary<string, Beatmap>();
 
@@ -43,6 +45,7 @@ namespace BeatMapsSharp
 
         public async Task<Beatmap?> Beatmap(string key, CancellationToken? token = null)
         {
+            key = key.ToLowerInvariant();
             if (_fetchedBeatmaps.TryGetValue(key, out Beatmap? beatmap))
                 return beatmap;
 
@@ -51,6 +54,7 @@ namespace BeatMapsSharp
 
         public async Task<Beatmap?> BeatmapByHash(string hash, CancellationToken? token = null)
         {
+            hash = hash.ToUpperInvariant();
             if (string.IsNullOrWhiteSpace(hash))
                 return null;
 
@@ -146,13 +150,61 @@ namespace BeatMapsSharp
 
         #endregion
 
+        #region Users
+
+        public async Task<User?> User(int id, CancellationToken? token = null)
+        {
+            if (_fetchedUsers.TryGetValue(id, out User? user))
+            {
+                // TODO: Update user... probably.
+                return user;
+            }
+
+            var response = await _httpService.GetAsync("users/id/" + id, token);
+            if (!response.Successful)
+                return null;
+
+            user = await response.ReadAsObjectAsync<User>();
+            GetOrAddUserToCache(user, out user);
+            return user;
+        }
+
+        public async Task<User?> User(string name, CancellationToken? token = null)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return null;
+
+            name = name.ToLowerInvariant();
+            if (_fetchedUsernames.TryGetValue(name, out User? user))
+            {
+                // TODO: Update user... probably.
+                return user;
+            }
+
+            var response = await _httpService.GetAsync("search/text/0?q=" + name, token).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+
+            var page = await response.ReadAsObjectAsync<SerializableSearch>();
+            if (page.Docs.Count == 0)
+                return null;
+
+            if (page.User is null)
+                return null;
+
+            GetOrAddUserToCache(page.User, out user);
+            return user;
+        }
+
+        #endregion
+
         private async Task<IReadOnlyList<Beatmap>?> GetBeatmapsFromPage(string url, CancellationToken? token = null)
         {
             var response = await _httpService.GetAsync(url, token).ConfigureAwait(false);
             if (!response.Successful)
                 return null;
 
-            var page = await response.ReadAsObjectAsync<SerializablePage>();
+            var page = await response.ReadAsObjectAsync<SerializableSearch>();
             if (page.Docs.Count == 0)
                 return null;
 
@@ -198,13 +250,45 @@ namespace BeatMapsSharp
             }
         }
 
-        private void PopulateWithClient(Beatmap beatmap)
+        private bool GetOrAddUserToCache(User user, out User cachedAndOrUser)
+        {
+            if (_fetchedUsers.TryGetValue(user.ID, out User? cachedUser))
+            {
+                // Update the stats field on any updated user objects.
+                if (user.Stats != null && cachedUser.Stats is null)
+                {
+                    cachedUser.Stats = user.Stats;
+                }
+                else if (cachedUser.Stats != null)
+                {
+                    if (!cachedUser.Stats.Equals(user.Stats))
+                        cachedUser.Stats = user.Stats;
+                }
+                cachedAndOrUser = cachedUser;
+                return false;
+            }
+            else
+            {
+                _fetchedUsers.TryAdd(user.ID, user);
+                cachedAndOrUser = user;
+
+                _fetchedUsernames.TryAdd(user.Name.ToLower(), user);
+                if (!user.HasClient)
+                    user.Client = this;
+                return true;
+            }
+        }
+
+        internal void PopulateWithClient(Beatmap beatmap)
         {
             if (!beatmap.HasClient)
                 beatmap.Client = this;
 
             if (!beatmap.Uploader.HasClient)
-                beatmap.Uploader.Client = this;
+            {
+                GetOrAddUserToCache(beatmap.Uploader, out var uploader);
+                beatmap.Uploader = uploader;
+            }
 
             foreach (var version in beatmap.Versions)
             {
@@ -218,7 +302,10 @@ namespace BeatMapsSharp
                             if (!testplay.HasClient)
                                 testplay.Client = this;
                             if (!testplay.User.HasClient)
-                                testplay.User.Client = this;
+                            {
+                                GetOrAddUserToCache(testplay.User, out var testplayer);
+                                testplay.User = testplayer;
+                            }
                         }
                     }
                 }

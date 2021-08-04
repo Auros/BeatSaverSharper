@@ -3,9 +3,12 @@ using System.Collections.ObjectModel;
 
 namespace BeatMapsSharp.Models.Pages
 {
-    internal class SerializablePage
+    internal class SerializableSearch
     {
         [JsonProperty("docs")]
         public ReadOnlyCollection<Beatmap> Docs { get; internal set; } = null!;
+
+        [JsonProperty("user")]
+        public User? User { get; internal set; }
     }
 }
