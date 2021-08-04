@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31515.178
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31521.260
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeatSaverSharp.Playground", "BeatSaverSharp.Playground\BeatSaverSharp.Playground.csproj", "{56FABEC8-3ADE-4A99-B6BE-C27902AB5B83}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeatSaverSharp", "BeatSaverSharp\BeatSaverSharp.csproj", "{333D2DB7-8187-4B05-948E-94B6C58BE848}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeatSaverSharp.Tests", "BeatSaverSharp.Tests\BeatSaverSharp.Tests.csproj", "{1503A7FB-2135-49D3-9B8D-31F377D571E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeatSaverSharp.Tests", "BeatSaverSharp.Tests\BeatSaverSharp.Tests.csproj", "{1503A7FB-2135-49D3-9B8D-31F377D571E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{56FABEC8-3ADE-4A99-B6BE-C27902AB5B83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56FABEC8-3ADE-4A99-B6BE-C27902AB5B83}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56FABEC8-3ADE-4A99-B6BE-C27902AB5B83}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56FABEC8-3ADE-4A99-B6BE-C27902AB5B83}.Release|Any CPU.Build.0 = Release|Any CPU
 		{333D2DB7-8187-4B05-948E-94B6C58BE848}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{333D2DB7-8187-4B05-948E-94B6C58BE848}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{333D2DB7-8187-4B05-948E-94B6C58BE848}.Release|Any CPU.ActiveCfg = Release|Any CPU
