@@ -1,7 +1,6 @@
 ﻿using BeatMapsSharp.Http;
 using BeatMapsSharp.Models;
 using BeatMapsSharp.Models.Pages;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -60,7 +59,7 @@ namespace BeatMapsSharp
 
         #region Paged Beatmaps
 
-        public async Task<Page?> Latest(LatestFilterOptions options = default, CancellationToken? token = null)
+        public async Task<Page?> LatestBeatmaps(LatestFilterOptions options = default, CancellationToken? token = null)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("maps/latest?automapper=");
@@ -72,7 +71,19 @@ namespace BeatMapsSharp
             if (result is null)
                 return null;
 
-            return new LatestPage(options, result)
+            return new UploadedPage(options, result)
+            {
+                Client = this
+            };
+        }
+
+        public async Task<Page?> UploaderBeatmaps(int uploaderID, int page = 0, CancellationToken? token = null)
+        {
+            var result = await GetBeatmapsFromPage($"maps/uploader/{uploaderID}/{page}", token).ConfigureAwait(false);
+            if (result is null)
+                return null;
+
+            return new UploaderPage(page, uploaderID, result)
             {
                 Client = this
             };

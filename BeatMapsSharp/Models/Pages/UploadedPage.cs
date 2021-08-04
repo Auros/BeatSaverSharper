@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 
 namespace BeatMapsSharp.Models.Pages
 {
-    internal sealed class LatestPage : Page
+    internal sealed class UploadedPage : Page
     {
         private Page? PreviousPage { get; set; }
         private readonly LatestFilterOptions _query;
         
-        public LatestPage(LatestFilterOptions query, IReadOnlyList<Beatmap> beatmaps, Page? previousPage = null) : base(beatmaps)
+        public UploadedPage(LatestFilterOptions query, IReadOnlyList<Beatmap> beatmaps, Page? previousPage = null) : base(beatmaps)
         {
             _query = query;
             PreviousPage = previousPage;
@@ -22,8 +22,8 @@ namespace BeatMapsSharp.Models.Pages
 
             Beatmap oldest = Beatmaps[^1];
             LatestFilterOptions options = new LatestFilterOptions(oldest.Uploaded, _query.IncludeAutomappers);
-            var nextPage = await Client.Latest(options, token).ConfigureAwait(false);
-            if (nextPage is LatestPage nextLatest)
+            var nextPage = await Client.LatestBeatmaps(options, token).ConfigureAwait(false);
+            if (nextPage is UploadedPage nextLatest)
                 nextLatest.PreviousPage = this;
             return nextPage;
         }
