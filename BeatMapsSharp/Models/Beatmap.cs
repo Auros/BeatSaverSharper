@@ -1,11 +1,13 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BeatMapsSharp.Models
 {
     /// <summary>
-    /// A BeatMaps beatmap.
+    /// A BeatSaver beatmap.
     /// </summary>
     public class Beatmap : BeatSaverObject, IEquatable<Beatmap>
     {
@@ -81,14 +83,19 @@ namespace BeatMapsSharp.Models
         [JsonProperty("versions")]
         public ReadOnlyCollection<BeatmapVersion> Versions { get; internal set; } = null!;
 
+        public Task Refresh(CancellationToken? token = null)
+        {
+            return Client.Beatmap(ID, token, true);
+        }
+
 
         // Equality Methods
 
         public bool Equals(Beatmap? other) => ID == other?.ID;
         public override int GetHashCode() => ID.GetHashCode();
         public override bool Equals(object? obj) => Equals(obj as Beatmap);
-        public static bool operator ==(Beatmap left, Beatmap right) => Equals(left, right);
-        public static bool operator !=(Beatmap left, Beatmap right) => Equals(left, right);
+        public static bool operator ==(Beatmap? left, Beatmap? right) => Equals(left, right);
+        public static bool operator !=(Beatmap? left, Beatmap? right) => Equals(left, right);
 
     }
 }

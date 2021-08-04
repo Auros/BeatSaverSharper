@@ -43,22 +43,22 @@ namespace BeatMapsSharp
 
         #region Beatmaps
 
-        public async Task<Beatmap?> Beatmap(string key, CancellationToken? token = null)
+        public async Task<Beatmap?> Beatmap(string key, CancellationToken? token = null, bool skipCacheCheck = false)
         {
             key = key.ToLowerInvariant();
-            if (_fetchedBeatmaps.TryGetValue(key, out Beatmap? beatmap))
+            if (!skipCacheCheck && _fetchedBeatmaps.TryGetValue(key, out Beatmap? beatmap))
                 return beatmap;
 
             return await FetchBeatmap("maps/id/" + key, token);
         }
 
-        public async Task<Beatmap?> BeatmapByHash(string hash, CancellationToken? token = null)
+        public async Task<Beatmap?> BeatmapByHash(string hash, CancellationToken? token = null, bool skipCacheCheck = false)
         {
             hash = hash.ToUpperInvariant();
             if (string.IsNullOrWhiteSpace(hash))
                 return null;
 
-            if (_fetchedHashedBeatmaps.TryGetValue(hash, out Beatmap? beatmap))
+            if (!skipCacheCheck && _fetchedHashedBeatmaps.TryGetValue(hash, out Beatmap? beatmap))
                 return beatmap;
 
             return await FetchBeatmap("maps/hash/" + hash, token);
@@ -152,9 +152,9 @@ namespace BeatMapsSharp
 
         #region Users
 
-        public async Task<User?> User(int id, CancellationToken? token = null)
+        public async Task<User?> User(int id, CancellationToken? token = null, bool skipCacheCheck = false)
         {
-            if (_fetchedUsers.TryGetValue(id, out User? user))
+            if (!skipCacheCheck && _fetchedUsers.TryGetValue(id, out User? user))
             {
                 // TODO: Update user... probably.
                 return user;
@@ -169,13 +169,13 @@ namespace BeatMapsSharp
             return user;
         }
 
-        public async Task<User?> User(string name, CancellationToken? token = null)
+        public async Task<User?> User(string name, CancellationToken? token = null, bool skipCacheCheck = false)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return null;
 
             name = name.ToLowerInvariant();
-            if (_fetchedUsernames.TryGetValue(name, out User? user))
+            if (!skipCacheCheck && _fetchedUsernames.TryGetValue(name, out User? user))
             {
                 // TODO: Update user... probably.
                 return user;
@@ -231,7 +231,36 @@ namespace BeatMapsSharp
         {
             if (_fetchedBeatmaps.TryGetValue(beatmap.ID, out Beatmap? cachedBeatmap))
             {
-                // TODO: Refresh beatmap, probably.
+                if (beatmap.Automapper != cachedBeatmap.Automapper)
+                    cachedBeatmap.Automapper = beatmap.Automapper;
+
+                if (beatmap.Curator != cachedBeatmap.Curator)
+                    cachedBeatmap.Curator = beatmap.Curator;
+
+                if (beatmap.Description != cachedBeatmap.Description)
+                    cachedBeatmap.Description = beatmap.Description;
+
+                if (beatmap.Metadata != cachedBeatmap.Metadata)
+                    cachedBeatmap.Metadata = beatmap.Metadata;
+
+                if (beatmap.Name != cachedBeatmap.Name)
+                    cachedBeatmap.Name = beatmap.Name;
+
+                if (beatmap.Qualified != cachedBeatmap.Qualified)
+                    cachedBeatmap.Qualified = beatmap.Qualified;
+
+                if (beatmap.Ranked != cachedBeatmap.Ranked)
+                    cachedBeatmap.Ranked = beatmap.Ranked;
+
+                if (beatmap.Stats != cachedBeatmap.Stats)
+                    cachedBeatmap.Stats = beatmap.Stats;
+
+                if (beatmap.Uploaded != cachedBeatmap.Uploaded)
+                    cachedBeatmap.Uploaded = beatmap.Uploaded;
+
+                cachedBeatmap.Versions = beatmap.Versions;
+                PopulateWithClient(cachedBeatmap);
+
                 cachedAndOrBeatmap = cachedBeatmap;
                 return false;
             }
@@ -254,6 +283,15 @@ namespace BeatMapsSharp
         {
             if (_fetchedUsers.TryGetValue(user.ID, out User? cachedUser))
             {
+                if (user.Hash != cachedUser.Hash)
+                    cachedUser.Hash = user.Hash;
+
+                if (user.Name != cachedUser.Name)
+                    cachedUser.Name = user.Name;
+
+                if (user.Avatar != cachedUser.Avatar)
+                    cachedUser.Avatar = user.Avatar;
+
                 // Update the stats field on any updated user objects.
                 if (user.Stats != null && cachedUser.Stats is null)
                 {

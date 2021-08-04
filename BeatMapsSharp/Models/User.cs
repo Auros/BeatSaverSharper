@@ -1,10 +1,12 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BeatMapsSharp.Models
 {
     /// <summary>
-    /// A BeatMaps user.
+    /// A BeatSaver user.
     /// </summary>
     public class User : BeatSaverObject, IEquatable<User>
     {
@@ -38,6 +40,10 @@ namespace BeatMapsSharp.Models
         [JsonProperty("stats")]
         public UserStats? Stats { get; internal set; }
 
+        public Task Refresh(CancellationToken? token = null)
+        {
+            return Client.User(ID, token, true);
+        }
 
         // Equality Methods
 
