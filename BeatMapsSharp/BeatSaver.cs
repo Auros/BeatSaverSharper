@@ -198,6 +198,28 @@ namespace BeatMapsSharp
 
         #endregion
 
+        #region Voting
+
+        /// <summary>
+        /// Submits a vote on a map.
+        /// </summary>
+        /// <param name="levelHash">The hash of the map to vote on.</param>
+        /// <param name="voteType">The voting type (whether it's an upvote or downvote).</param>
+        /// <param name="platform">The platform in which the vote is coming from. This should be related to the <paramref name="platformID"/></param>
+        /// <param name="platformID">The platform ID of the user submitting this vote. This should correspond to <paramref name="platform"/></param>
+        /// <param name="proof">The proof (secret, auth ticket, etc) which can be used to verify people.</param>
+        /// <returns></returns>
+        public async Task<VoteResponse> Vote(string levelHash, Vote.Type voteType, Vote.Platform platform, string platformID, string proof, CancellationToken? token = null)
+        {
+            var vote = new Vote(levelHash, voteType, platform, platformID, proof);
+            var response = await _httpService.PostAsync("/vote", vote, token);
+            if (!response.Successful)
+                return new VoteResponse { Successful = false, Error = $"{nameof(BeatMapsSharp)}: Unknown" };
+            return await response.ReadAsObjectAsync<VoteResponse>();
+        }
+
+        #endregion
+
         private async Task<IReadOnlyList<Beatmap>?> GetBeatmapsFromPage(string url, CancellationToken? token = null)
         {
             var response = await _httpService.GetAsync(url, token).ConfigureAwait(false);

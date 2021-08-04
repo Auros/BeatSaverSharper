@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace BeatMapsSharp.Models
 {
@@ -80,6 +82,11 @@ namespace BeatMapsSharp.Models
         /// </summary>
         [JsonProperty("previewURL")]
         public string PreviewURL { get; internal set; } = null!;
+
+        public Task<VoteResponse> Vote(Vote.Type voteType, Vote.Platform platform, string platformID, string proof, CancellationToken? token = null)
+        {
+            return Client.Vote(Hash, voteType, platform, platformID, proof, token);
+        }
 
         // Equality Methods
 

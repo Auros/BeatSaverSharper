@@ -88,7 +88,6 @@ namespace BeatMapsSharp.Models
             return Client.Beatmap(ID, token, true);
         }
 
-
         // Equality Methods
 
         public bool Equals(Beatmap? other) => ID == other?.ID;
