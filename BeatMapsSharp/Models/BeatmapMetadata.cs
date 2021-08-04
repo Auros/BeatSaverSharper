@@ -20,18 +20,6 @@ namespace BeatMapsSharp.Models
         public int Duration { get; internal set; }
 
         /// <summary>
-        /// The name of the level author, as defined in the map's Info.dat
-        /// </summary>
-        [JsonProperty("levelAuthorName")]
-        public string LevelAuthorName { get; internal set; } = null!;
-
-        /// <summary>
-        /// The name of the song author, as defined in the map's Info.dat
-        /// </summary>
-        [JsonProperty("songAuthorName")]
-        public string SongAuthorName { get; internal set; } = null!;
-
-        /// <summary>
         /// The name of the song, as defined in the map's Info.dat
         /// </summary>
         [JsonProperty("songName")]
@@ -42,5 +30,17 @@ namespace BeatMapsSharp.Models
         /// </summary>
         [JsonProperty("songSubName")]
         public string SongSubName { get; internal set; } = null!;
+
+        /// <summary>
+        /// The name of the song author, as defined in the map's Info.dat
+        /// </summary>
+        [JsonProperty("songAuthorName")]
+        public string SongAuthorName { get; internal set; } = null!;
+
+        /// <summary>
+        /// The name of the level author, as defined in the map's Info.dat
+        /// </summary>
+        [JsonProperty("levelAuthorName")]
+        public string LevelAuthorName { get; internal set; } = null!;
     }
 }

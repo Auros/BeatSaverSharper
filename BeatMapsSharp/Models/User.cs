@@ -11,16 +11,10 @@ namespace BeatMapsSharp.Models
     public class User : BeatSaverObject, IEquatable<User>
     {
         /// <summary>
-        /// The avatar URL of the user.
+        /// The unique ID of the user.
         /// </summary>
-        [JsonProperty("avatar")]
-        public string Avatar { get; internal set; } = null!;
-
-        /// <summary>
-        /// The hash of the avatar URL.
-        /// </summary>
-        [JsonProperty("hash")]
-        public string? Hash { get; internal set; } = null!;
+        [JsonProperty("id")]
+        public int ID { get; internal set; }
 
         /// <summary>
         /// The name of the user.
@@ -29,10 +23,16 @@ namespace BeatMapsSharp.Models
         public string Name { get; internal set; } = null!;
 
         /// <summary>
-        /// The unique ID of the user.
+        /// The hash of the avatar URL.
         /// </summary>
-        [JsonProperty("id")]
-        public int ID { get; internal set; }
+        [JsonProperty("hash")]
+        public string? Hash { get; internal set; } = null!;
+
+        /// <summary>
+        /// The avatar URL of the user.
+        /// </summary>
+        [JsonProperty("avatar")]
+        public string Avatar { get; internal set; } = null!;
 
         /// <summary>
         /// The mapping stats of the user.

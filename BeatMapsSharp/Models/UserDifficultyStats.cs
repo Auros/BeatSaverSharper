@@ -8,6 +8,12 @@ namespace BeatMapsSharp.Models
     public class UserDifficultyStats
     {
         /// <summary>
+        /// The total amount of maps a user has uploaded.
+        /// </summary>
+        [JsonProperty("total")]
+        public int Total { get; internal set; }
+
+        /// <summary>
         /// The amount of easy maps a user has uploaded.
         /// </summary>
         [JsonProperty("easy")]
@@ -36,11 +42,5 @@ namespace BeatMapsSharp.Models
         /// </summary>
         [JsonProperty("expertPlus")]
         public int ExpertPlus { get; internal set; }
-
-        /// <summary>
-        /// The total amount of maps a user has uploaded.
-        /// </summary>
-        [JsonProperty("total")]
-        public int Total { get; internal set; }
     }
 }

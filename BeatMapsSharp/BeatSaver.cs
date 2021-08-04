@@ -156,7 +156,7 @@ namespace BeatMapsSharp
         {
             if (!skipCacheCheck && _fetchedUsers.TryGetValue(id, out User? user))
             {
-                // TODO: Update user... probably.
+                GetOrAddUserToCache(user, out user);
                 return user;
             }
 
@@ -177,7 +177,7 @@ namespace BeatMapsSharp
             name = name.ToLowerInvariant();
             if (!skipCacheCheck && _fetchedUsernames.TryGetValue(name, out User? user))
             {
-                // TODO: Update user... probably.
+                GetOrAddUserToCache(user, out user);
                 return user;
             }
 
