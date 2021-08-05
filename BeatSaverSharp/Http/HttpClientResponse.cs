@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿#if RELEASE
+using Newtonsoft.Json;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -30,7 +31,7 @@ namespace BeatSaverSharp.Http
         public async Task<byte[]> ReadAsByteArrayAsync()
         {
             if (_bytes is null)
-                _bytes = await _httpResponseMessage.Content.ReadAsByteArrayAsync();
+                _bytes = await _httpResponseMessage.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
             return _bytes;
         }
 
@@ -39,7 +40,7 @@ namespace BeatSaverSharp.Http
             if (_bodyAsString is null)
             {
                 if (_bytes is null)
-                    _bytes = await ReadAsByteArrayAsync();
+                    _bytes = await ReadAsByteArrayAsync().ConfigureAwait(false);
                 _bodyAsString = Encoding.UTF8.GetString(_bytes);
             }
             return _bodyAsString;
@@ -47,9 +48,10 @@ namespace BeatSaverSharp.Http
 
         public async Task<T> ReadAsObjectAsync<T>() where T : class
         {
-            using StringReader reader = new StringReader(await ReadAsStringAsync());
+            using StringReader reader = new StringReader(await ReadAsStringAsync().ConfigureAwait(false));
             using JsonTextReader jsonTextReader = new JsonTextReader(reader);
             return _jsonSerializer.Deserialize<T>(jsonTextReader)!;
         }
     }
 }
+#endif

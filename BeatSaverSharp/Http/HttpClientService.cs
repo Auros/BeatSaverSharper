@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿#if RELEASE
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net;
@@ -77,3 +78,4 @@ namespace BeatSaverSharp.Http
         }
     }
 }
+#endif

@@ -63,7 +63,7 @@ namespace BeatSaverSharp.Models
         public override int GetHashCode() => ID.GetHashCode();
         public override bool Equals(object? obj) => Equals(obj as User);
         public static bool operator ==(User left, User right) => Equals(left, right);
-        public static bool operator !=(User left, User right) => Equals(left, right);
+        public static bool operator !=(User left, User right) => !Equals(left, right);
 
     }
 }

@@ -21,6 +21,8 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore --configuration Release --no-restore
+    - name: Build (Unity)
+      run: dotnet build --no-restore --configuration Release-Unity --no-restore
     - name: Test
       run: dotnet test --no-build --configuration Release --verbosity normal
     - name: Upload
@@ -28,3 +30,8 @@ jobs:
       with:
         name: BeatSaverSharp
         path: BeatSaverSharp/bin/Release/netstandard2.0
+    - name: Upload (Unity)
+      uses: actions/upload-artifact@v2
+      with:
+        name: BeatSaverSharp
+        path: BeatSaverSharp/bin/Release-Unity/netstandard2.0

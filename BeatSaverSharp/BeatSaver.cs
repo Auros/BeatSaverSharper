@@ -43,7 +43,17 @@ namespace BeatSaverSharp
 
         public BeatSaver(BeatSaverOptions beatSaverOptions)
         {
-            _httpService = new HttpClientService(beatSaverOptions.BeatSaverAPI.ToString(), beatSaverOptions.Timeout, $"{beatSaverOptions.ApplicationName}/{beatSaverOptions.Version}");
+            string userAgent = $"{beatSaverOptions.ApplicationName}/{beatSaverOptions.Version}";
+#if RELEASE_UNITY
+            _httpService = new UnityWebRequestService()
+            {
+                BaseURL = beatSaverOptions.BeatSaverAPI.ToString(),
+                Timeout = beatSaverOptions.Timeout,
+                UserAgent = userAgent,
+            };
+#else
+            _httpService = new HttpClientService(beatSaverOptions.BeatSaverAPI.ToString(), beatSaverOptions.Timeout, userAgent);
+#endif
         }
 
         public BeatSaver(string applicationName, Version version) : this(new BeatSaverOptions(applicationName, version))
@@ -51,7 +61,7 @@ namespace BeatSaverSharp
 
         }
 
-        #region Beatmaps
+#region Beatmaps
 
         public async Task<Beatmap?> Beatmap(string key, CancellationToken token = default, bool skipCacheCheck = false)
         {
@@ -59,19 +69,18 @@ namespace BeatSaverSharp
             if (!skipCacheCheck && _fetchedBeatmaps.TryGetValue(key, out Beatmap? beatmap))
                 return beatmap;
 
-            return await FetchBeatmap("maps/id/" + key, token);
+            return await FetchBeatmap("maps/id/" + key, token).ConfigureAwait(false);
         }
 
         public async Task<Beatmap?> BeatmapByHash(string hash, CancellationToken token = default, bool skipCacheCheck = false)
         {
-            hash = hash.ToUpperInvariant();
             if (string.IsNullOrWhiteSpace(hash))
                 return null;
+            hash = hash.ToUpperInvariant();
 
             if (!skipCacheCheck && _fetchedHashedBeatmaps.TryGetValue(hash, out Beatmap? beatmap))
                 return beatmap;
-
-            return await FetchBeatmap("maps/hash/" + hash, token);
+            return await FetchBeatmap("maps/hash/" + hash, token).ConfigureAwait(false);
         }
 
         private async Task<Beatmap?> FetchBeatmap(string url, CancellationToken token = default)
@@ -80,14 +89,14 @@ namespace BeatSaverSharp
             if (!response.Successful)
                 return null;
 
-            Beatmap beatmap = await response.ReadAsObjectAsync<Beatmap>();
+            Beatmap beatmap = await response.ReadAsObjectAsync<Beatmap>().ConfigureAwait(false);
             GetOrAddBeatmapToCache(beatmap, out beatmap);
             return beatmap;
         }
 
-        #endregion
+#endregion
 
-        #region Paged Beatmaps
+#region Paged Beatmaps
 
         public async Task<Page?> LatestBeatmaps(UploadedFilterOptions? options = default, CancellationToken token = default)
         {
@@ -149,7 +158,7 @@ namespace BeatSaverSharp
                 }
             }
 
-            var result = await GetBeatmapsFromPage(searchURL, token);
+            var result = await GetBeatmapsFromPage(searchURL, token).ConfigureAwait(false);
             if (result is null)
                 return null;
 
@@ -159,9 +168,9 @@ namespace BeatSaverSharp
             };
         }
 
-        #endregion
+#endregion
 
-        #region Users
+#region Users
 
         public async Task<User?> User(int id, CancellationToken token = default, bool skipCacheCheck = false)
         {
@@ -171,11 +180,11 @@ namespace BeatSaverSharp
                 return user;
             }
 
-            var response = await _httpService.GetAsync("users/id/" + id, token);
+            var response = await _httpService.GetAsync("users/id/" + id, token).ConfigureAwait(false);
             if (!response.Successful)
                 return null;
 
-            user = await response.ReadAsObjectAsync<User>();
+            user = await response.ReadAsObjectAsync<User>().ConfigureAwait(false);
             GetOrAddUserToCache(user, out user);
             return user;
         }
@@ -196,7 +205,7 @@ namespace BeatSaverSharp
             if (!response.Successful)
                 return null;
 
-            var page = await response.ReadAsObjectAsync<SerializableSearch>();
+            var page = await response.ReadAsObjectAsync<SerializableSearch>().ConfigureAwait(false);
             if (page.Docs.Count == 0)
                 return null;
 
@@ -207,9 +216,9 @@ namespace BeatSaverSharp
             return user;
         }
 
-        #endregion
+#endregion
 
-        #region Voting
+#region Voting
 
         /// <summary>
         /// Submits a vote on a map.
@@ -224,15 +233,15 @@ namespace BeatSaverSharp
         public async Task<VoteResponse> Vote(string levelHash, Vote.Type voteType, Vote.Platform platform, string platformID, string proof, CancellationToken token = default)
         {
             var vote = new Vote(levelHash, voteType, platform, platformID, proof);
-            var response = await _httpService.PostAsync("/vote", vote, token);
+            var response = await _httpService.PostAsync("/vote", vote, token).ConfigureAwait(false);
             if (!response.Successful)
                 return new VoteResponse { Successful = false, Error = $"{nameof(BeatSaverSharp)}: Unknown" };
-            return await response.ReadAsObjectAsync<VoteResponse>();
+            return await response.ReadAsObjectAsync<VoteResponse>().ConfigureAwait(false);
         }
 
-        #endregion
+#endregion
 
-        #region Byte Fetching
+#region Byte Fetching
 
         internal async Task<byte[]?> DownloadZIP(BeatmapVersion version, CancellationToken token = default, IProgress<double>? progress = null)
         {
@@ -258,7 +267,7 @@ namespace BeatSaverSharp
             return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
 
-        #endregion
+#endregion
 
         private async Task<IReadOnlyList<Beatmap>?> GetBeatmapsFromPage(string url, CancellationToken token = default)
         {
@@ -266,7 +275,7 @@ namespace BeatSaverSharp
             if (!response.Successful)
                 return null;
 
-            var page = await response.ReadAsObjectAsync<SerializableSearch>();
+            var page = await response.ReadAsObjectAsync<SerializableSearch>().ConfigureAwait(false);
             if (page.Docs.Count == 0)
                 return null;
 

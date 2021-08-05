@@ -109,7 +109,7 @@ namespace BeatSaverSharp.Models
         public override int GetHashCode() => Hash.GetHashCode();
         public override bool Equals(object? obj) => Equals(obj as BeatmapVersion);
         public static bool operator ==(BeatmapVersion left, BeatmapVersion right) => Equals(left, right);
-        public static bool operator !=(BeatmapVersion left, BeatmapVersion right) => Equals(left, right);
+        public static bool operator !=(BeatmapVersion left, BeatmapVersion right) => !Equals(left, right);
 
         public enum VersionState
         {
