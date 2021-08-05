@@ -9,5 +9,7 @@ namespace BeatSaverSharp.Models
 
         [JsonProperty("Success")]
         public bool Successful { get; set; }
+
+        internal VoteResponse() { }
     }
 }

@@ -41,6 +41,8 @@ namespace BeatSaverSharp.Models
         [JsonProperty("stats")]
         public UserStats? Stats { get; internal set; }
 
+        internal User() { }
+
         public Task Refresh(CancellationToken token = default)
         {
             return Client.User(ID, token, true);
@@ -55,7 +57,7 @@ namespace BeatSaverSharp.Models
         public Task<Page?> Beatmaps(int page = 0, CancellationToken token = default)
         {
             return Client.UploaderBeatmaps(ID, page, token);
-        } 
+        }
 
         // Equality Methods
 

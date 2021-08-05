@@ -95,5 +95,20 @@ namespace BeatSaverSharp.Tests
             // The zorowo by name search should have non-null user stats.
             Assert.IsNotNull(zorowo.Stats);
         }
+
+        [TestMethod]
+        public async Task TestSmartUserCachingUserInverseDirect()
+        {
+            // Load by ID, which also loads the user stats.
+            var reaxtWeAreBack = await Client.User(4235136);
+            Assert.IsNotNull(reaxtWeAreBack);
+            Assert.IsNotNull(reaxtWeAreBack.Stats);
+
+            // Now we search by username
+            var reaxtBackFromWhere = await Client.User("Reaxt");
+            // And its user stats should NOT be null since we loaded reaxt (we are back back from where back from paradise warfare) explicitly earlier.
+            Assert.IsNotNull(reaxtBackFromWhere);
+            Assert.IsNotNull(reaxtBackFromWhere.Stats);
+        }
     }
 }

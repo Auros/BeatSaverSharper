@@ -42,5 +42,7 @@ namespace BeatSaverSharp.Models
         /// </summary>
         [JsonProperty("expertPlus")]
         public int ExpertPlus { get; internal set; }
+
+        internal UserDifficultyStats() { }
     }
 }

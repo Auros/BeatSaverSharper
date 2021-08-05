@@ -109,6 +109,8 @@ namespace BeatSaverSharp.Models
         [JsonProperty("stars")]
         public float? Stars { get; internal set; }
 
+        internal BeatmapDifficulty() { }
+
         public enum BeatmapCharacteristic
         {
             Standard,

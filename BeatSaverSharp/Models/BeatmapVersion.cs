@@ -83,6 +83,8 @@ namespace BeatSaverSharp.Models
         [JsonProperty("previewURL")]
         public string PreviewURL { get; internal set; } = null!;
 
+        internal BeatmapVersion() { }
+
         public Task<VoteResponse> Vote(Vote.Type voteType, Vote.Platform platform, string platformID, string proof, CancellationToken token = default)
         {
             return Client.Vote(Hash, voteType, platform, platformID, proof, token);

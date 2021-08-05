@@ -37,5 +37,7 @@ namespace BeatSaverSharp.Models
         /// </summary>
         [JsonProperty("user")]
         public User User { get; internal set; } = null!;
+
+        internal BeatmapTestplay() { }
     }
 }

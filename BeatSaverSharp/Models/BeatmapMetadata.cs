@@ -42,5 +42,7 @@ namespace BeatSaverSharp.Models
         /// </summary>
         [JsonProperty("levelAuthorName")]
         public string LevelAuthorName { get; internal set; } = null!;
+
+        internal BeatmapMetadata() { }
     }
 }

@@ -68,6 +68,8 @@ namespace BeatSaverSharp.Models
         [JsonProperty("diffStats")]
         public UserDifficultyStats? DifficultyStats { get; internal set; }
 
+        internal UserStats() { }
+
         public bool Equals(UserStats? other)
         {
             if (other is null)

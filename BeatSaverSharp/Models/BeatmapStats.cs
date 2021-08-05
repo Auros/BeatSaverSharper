@@ -34,5 +34,7 @@ namespace BeatSaverSharp.Models
         /// </summary>
         [JsonProperty("score")]
         public float Score { get; internal set; }
+
+        internal BeatmapStats() { }
     }
 }

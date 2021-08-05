@@ -8,7 +8,7 @@ namespace BeatSaverSharp.Tests
     [TestClass]
     public class SearchTests
     {
-        [TestMethod]
+        /*[TestMethod]
         public async Task AutomappersAreCringe()
         {
             var automappersBad = await Client.SearchBeatmaps(new SearchTextFilterOption
@@ -38,7 +38,7 @@ namespace BeatSaverSharp.Tests
             {
                 Assert.IsTrue(map.Automapper);
             }
-        }
+        }*/
 
         [TestMethod]
         public async Task NoodleExtensionsAndChromaOnly()

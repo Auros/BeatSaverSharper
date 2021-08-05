@@ -24,5 +24,7 @@ namespace BeatSaverSharp.Models
         /// </summary>
         [JsonProperty("warns")]
         public int Warns { get; internal set; }
+
+        internal BeatmapParitySummary() { }
     }
 }
