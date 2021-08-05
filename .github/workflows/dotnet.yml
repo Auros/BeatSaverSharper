@@ -28,10 +28,10 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
-        name: BeatSaverSharp
+        name: BeatSaverSharp.zip
         path: BeatSaverSharp/bin/Release/netstandard2.0
     - name: Upload (Unity)
       uses: actions/upload-artifact@v2
       with:
-        name: BeatSaverSharp
+        name: BeatSaverSharp (Unity).zip
         path: BeatSaverSharp/bin/Release-Unity/netstandard2.0
