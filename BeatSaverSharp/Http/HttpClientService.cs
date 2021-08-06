@@ -1,4 +1,4 @@
-﻿#if RELEASE
+﻿#if !RELEASE_UNITY
 using Newtonsoft.Json;
 using System;
 using System.IO;

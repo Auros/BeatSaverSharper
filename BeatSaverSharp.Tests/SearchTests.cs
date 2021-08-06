@@ -91,5 +91,19 @@ namespace BeatSaverSharp.Tests
                 Assert.IsTrue(map.Ranked);
             }
         }
+
+        [TestMethod]
+        public async Task SearchForMapByName()
+        {
+            // https://cdn.discordapp.com/attachments/463664976767352862/779247574502735882/i.mp4
+            var imageMaterialByName = await Client.SearchBeatmaps(new SearchTextFilterOption("Tatsh - IMAGE -MATERIAL- (Version 0)"));
+            Assert.IsNotNull(imageMaterialByName);
+            Assert.IsFalse(imageMaterialByName.Empty);
+
+            var imageMaterialByID = await Client.Beatmap("28a");
+            Assert.IsNotNull(imageMaterialByID);
+
+            Assert.AreEqual(imageMaterialByName.Beatmaps.First(b => b.Uploader == imageMaterialByID.Uploader), imageMaterialByID);
+        }
     }
 }
