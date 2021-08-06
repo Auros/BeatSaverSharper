@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace BeatSaverSharp.Models
 {
@@ -116,8 +117,13 @@ namespace BeatSaverSharp.Models
             Standard,
             OneSaber,
             NoArrows,
+
+            [EnumMember(Value = "90Degree")]
             _90Degree,
+
+            [EnumMember(Value = "360Degree")]
             _360Degree,
+
             Lightshow,
             Lawless
         }
