@@ -16,7 +16,7 @@ namespace BeatSaverSharp.Models
         /// <summary>
         /// The characteristic of the difficulty.
         /// </summary>
-        [JsonProperty("characteristics")]
+        [JsonProperty("characteristic")]
         public BeatmapCharacteristic Characteristic { get; internal set; }
 
         /// <summary>
