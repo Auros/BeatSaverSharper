@@ -19,6 +19,8 @@ namespace BeatSaverSharp
     public class BeatSaver : IDisposable
     {
         internal bool IsDisposed { get; set; }
+
+        private BeatSaverOptions _options;
         private readonly IHttpService _httpService;
         private readonly object _bLock = new object();
         private readonly object _uLock = new object();
@@ -43,6 +45,7 @@ namespace BeatSaverSharp
 
         public BeatSaver(BeatSaverOptions beatSaverOptions)
         {
+            _options = beatSaverOptions;
             string userAgent = $"{beatSaverOptions.ApplicationName}/{beatSaverOptions.Version}";
 #if RELEASE_UNITY
             _httpService = new UnityWebRequestService()
@@ -269,6 +272,32 @@ namespace BeatSaverSharp
 
 #endregion
 
+        private void ProcessCache()
+        {
+            if (_options.MaximumCacheSize == null || _options.MaximumCacheSize == 0)
+                return;
+
+            if (_fetchedUsers.Count > _options.MaximumCacheSize)
+            {
+                _fetchedUsers.TryRemove(_fetchedUsers.Keys.GetEnumerator().Current, out _);
+            }
+
+            if (_fetchedUsernames.Count > _options.MaximumCacheSize)
+            {
+                _fetchedUsernames.TryRemove(_fetchedUsernames.Keys.GetEnumerator().Current, out _);
+            }
+
+            if (_fetchedBeatmaps.Count > _options.MaximumCacheSize)
+            {
+                _fetchedBeatmaps.TryRemove(_fetchedBeatmaps.Keys.GetEnumerator().Current, out _);
+            }
+
+            if (_fetchedHashedBeatmaps.Count > _options.MaximumCacheSize)
+            {
+                _fetchedHashedBeatmaps.TryRemove(_fetchedHashedBeatmaps.Keys.GetEnumerator().Current, out _);
+            }
+        }
+
         private async Task<IReadOnlyList<Beatmap>?> GetBeatmapsFromPage(string url, CancellationToken token = default)
         {
             var response = await _httpService.GetAsync(url, token).ConfigureAwait(false);
@@ -300,6 +329,13 @@ namespace BeatSaverSharp
         /// <returns>Returns true if it was added. Returns false if it was already cached.</returns>
         private bool GetOrAddBeatmapToCache(Beatmap beatmap, out Beatmap cachedAndOrBeatmap)
         {
+            if (!_options.Cache)
+            {
+                cachedAndOrBeatmap = beatmap;
+                return false;
+            }
+            ProcessCache();
+
             lock (_bLock)
             {
                 if (_fetchedBeatmaps.TryGetValue(beatmap.ID, out Beatmap? cachedBeatmap))
@@ -357,6 +393,13 @@ namespace BeatSaverSharp
 
         private bool GetOrAddUserToCache(User user, out User cachedAndOrUser)
         {
+            if (!_options.Cache)
+            {
+                cachedAndOrUser = user;
+                return false;
+            }
+            ProcessCache();
+
             lock (_uLock)
             {
                 if (_fetchedUsers.TryGetValue(user.ID, out User? cachedUser))
@@ -440,6 +483,14 @@ namespace BeatSaverSharp
                     }
                 }
             }
+        }
+
+        public void Clear()
+        {
+            _fetchedUsers.Clear();
+            _fetchedUsernames.Clear();
+            _fetchedBeatmaps.Clear();
+            _fetchedHashedBeatmaps.Clear();
         }
 
         public void Dispose()
