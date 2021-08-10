@@ -52,16 +52,11 @@ namespace BeatSaverSharp.Http
 
         private async Task<IHttpResponse> SendAsync(HTTPMethod method, string url, string? body = null, IDictionary<string, string>? withHeaders = null, IProgress<double>? downloadProgress = null, CancellationToken cancellationToken = default)
         {
-            string newURL = url;
             if (BaseURL != null && !url.StartsWith("http"))
-                newURL = Path.Combine(BaseURL, url);
+                url = Path.Combine(BaseURL, url);
             DownloadHandler? dHandler = new DownloadHandlerBuffer();
 
-            HTTPMethod originalMethod = method;
-            if (method == HTTPMethod.POST && body != null)
-                method = HTTPMethod.PUT;
-
-            using UnityWebRequest request = new UnityWebRequest(newURL, method.ToString(), dHandler, null);
+            using UnityWebRequest request = method == HTTPMethod.GET ? UnityWebRequest.Get(url) : (body == null ? UnityWebRequest.Post(url, body) : UnityWebRequest.Put(url, body));
             request.timeout = Timeout.HasValue ? (int)Timeout.Value.TotalSeconds : 0;
 
             foreach (var header in Headers)
@@ -75,9 +70,9 @@ namespace BeatSaverSharp.Http
                 request.SetRequestHeader("Content-Type", "application/json");
 
             // some unity bull
-            if (body != null && originalMethod == HTTPMethod.POST && method == HTTPMethod.PUT)
+            if (body != null)
             {
-                request.method = method.ToString();
+                request.method = "POST";
             }
 
             double _lastProgress = -1;
@@ -108,8 +103,7 @@ namespace BeatSaverSharp.Http
         private enum HTTPMethod
         {
             GET,
-            POST,
-            PUT
+            POST
         }
     }
 }

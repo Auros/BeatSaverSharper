@@ -236,9 +236,23 @@ namespace BeatSaverSharp
         public async Task<VoteResponse> Vote(string levelHash, Vote.Type voteType, Vote.Platform platform, string platformID, string proof, CancellationToken token = default)
         {
             var vote = new Vote(levelHash, voteType, platform, platformID, proof);
-            var response = await _httpService.PostAsync("/vote", vote, token).ConfigureAwait(false);
+            var response = await _httpService.PostAsync("vote", vote, token).ConfigureAwait(false);
             if (!response.Successful)
-                return new VoteResponse { Successful = false, Error = $"{nameof(BeatSaverSharp)}: Unknown" };
+            {
+                string reason;
+                if (response.Code == 500)
+                    reason = "Server error";
+                else if (response.Code == 401)
+                    reason = "Invalid auth ticket";
+                else if (response.Code == 404)
+                    reason = "Beatmap not found";
+                else if (response.Code == 400)
+                    reason = "Bad Request";
+                else
+                    reason = $"{nameof(BeatSaverSharp)}: Unknown";
+
+                return new VoteResponse { Successful = false, Error = reason };
+            }
             return await response.ReadAsObjectAsync<VoteResponse>().ConfigureAwait(false);
         }
 
