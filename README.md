@@ -4,7 +4,7 @@ A C# library to interact with the [BeatSaver](https://beatsaver.com) [API](https
 
 ## ⬇️ Downloading
 
-If you're trying to download this as a dependency for a Beat Saber mod, go to the [Releases]() page, find and download the latest (or the one that you need) `BeatSaverSharper-BeatSaber.zip`, download it, and extract it in your `Beat Saber` folder.
+If you're trying to download this as a dependency for a Beat Saber mod, go to the [Releases](https://github.com/Auros/BeatSaverSharper/releases/latest) page, find and download the latest (or the one that you need) `BeatSaverSharper-Beat Saber.zip`, download it, and extract it in your `Beat Saber` folder.
 
 Alternatively, you can pick up the latest successful build based off of `main` in the [GitHub Actions](https://github.com/Auros/BeatSaverSharper/actions) page as an artifact (both normal and Unity versions).
 
