@@ -49,51 +49,12 @@ namespace BeatSaverSharp.Tests
             Assert.IsNull(toxicVioletCubes.Uploader.Stats);
 
             // Now we get the user directly
-            var abcbadq = await Client.User(390);
+            var abcbadq = await Client.User(4284943);
             Assert.IsNotNull(abcbadq);
             Assert.IsNotNull(abcbadq.Stats);
 
             // And the user stats property from Toxic Violet Cubes should have been updated
             Assert.IsNotNull(toxicVioletCubes.Uploader.Stats);
-        }
-
-        [TestMethod]
-        public async Task TestSmartUserCachingUserDirect()
-        {
-            // Umbranox
-            var umbranoxByName = await Client.User("umbranox");
-            Assert.IsNotNull(umbranoxByName);
-
-            // Stats should be null since we searched by username.
-            Assert.IsNull(umbranoxByName.Stats);
-
-            // True Umbranox
-            var umbranoxByID = await Client.User(24854);
-            Assert.IsNotNull(umbranoxByID);
-
-            // Stats should be NOT null since we searched by ID.
-            Assert.IsNotNull(umbranoxByID.Stats);
-
-            // The umbranox by name search should have non-null user stats.
-            Assert.IsNotNull(umbranoxByName.Stats);
-        }
-
-
-        [TestMethod]
-        public async Task TestSmartUserCachingUserRefresh()
-        {
-            // zorowo
-            var zorowo = await Client.User("zorowo");
-            Assert.IsNotNull(zorowo);
-
-            // Stats should be null since we searched by username.
-            Assert.IsNull(zorowo.Stats);
-
-            // Now we refresh
-            await zorowo.Refresh();
-
-            // The zorowo by name search should have non-null user stats.
-            Assert.IsNotNull(zorowo.Stats);
         }
 
         [TestMethod]

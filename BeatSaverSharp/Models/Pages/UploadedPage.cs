@@ -28,9 +28,14 @@ namespace BeatSaverSharp.Models.Pages
             return nextPage;
         }
 
-        public override Task<Page?> Previous(CancellationToken token = default)
+        public override async Task<Page?> Previous(CancellationToken token = default)
         {
-            return Task.FromResult(PreviousPage);
+            if (PreviousPage is null && Beatmaps.Count > 0)
+            {
+                UploadedFilterOptions options = new UploadedFilterOptions(_query.StartDate, Beatmaps[0].Uploaded, _query.IncludeAutomappers, _query.Sort);
+                PreviousPage = await Client.LatestBeatmaps(options, token).ConfigureAwait(false);
+            }
+            return await Task.FromResult(PreviousPage);
         }
     }
 }

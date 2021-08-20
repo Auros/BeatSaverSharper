@@ -24,7 +24,7 @@ namespace BeatSaverSharp.Tests
             Assert.IsFalse(ratingPage.Empty);
 
             // Now we check to see if they're in the right order
-            Assert.IsTrue(ratingPage.Beatmaps[ratingPage.Beatmaps.Count - 1].Stats.Score > nextPage.Beatmaps[0].Stats.Score);
+            Assert.IsTrue(ratingPage.Beatmaps[ratingPage.Beatmaps.Count - 1].Stats.Score >= nextPage.Beatmaps[0].Stats.Score);
 
             // And now we test is the previous page is the same as the first.
             var previousPage = await nextPage.Previous();

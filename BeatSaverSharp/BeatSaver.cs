@@ -109,7 +109,20 @@ namespace BeatSaverSharp
             sb.Append("maps/latest?automapper=");
             sb.Append(options.IncludeAutomappers);
             if (options.StartDate.HasValue)
-                sb.Append("&after=").Append(options.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+                sb.Append("&before=").Append(options.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+            if (options.Before.HasValue)
+                sb.Append("&after=").Append(options.Before.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+            if (options.Sort.HasValue)
+            {
+                string sort = options.Sort.Value switch
+                {
+                    LatestFilterSort.CREATED => "CREATED",
+                    LatestFilterSort.UPDATED => "UPDATED",
+                    LatestFilterSort.LAST_PUBLISHED => "LAST_PUBLISHED",
+                    _ => "FIRST_PUBLISHED",
+                };
+                sb.Append("&sort=").Append(sort);
+            }
 
             var result = await GetBeatmapsFromPage(sb.ToString(), token).ConfigureAwait(false);
             if (result is null)
@@ -204,18 +217,15 @@ namespace BeatSaverSharp
                 return user;
             }
 
-            var response = await _httpService.GetAsync("search/text/0?q=" + name, token).ConfigureAwait(false);
+            var response = await _httpService.GetAsync("users/name/" + name, token).ConfigureAwait(false);
             if (!response.Successful)
                 return null;
 
-            var page = await response.ReadAsObjectAsync<SerializableSearch>().ConfigureAwait(false);
-            if (page.Docs.Count == 0)
+            var fetchedUser = await response.ReadAsObjectAsync<User>().ConfigureAwait(false);
+            if (fetchedUser is null)
                 return null;
 
-            if (page.User is null)
-                return null;
-
-            GetOrAddUserToCache(page.User, out user);
+            GetOrAddUserToCache(fetchedUser, out user);
             return user;
         }
 
