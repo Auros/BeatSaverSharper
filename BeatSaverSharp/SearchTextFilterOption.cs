@@ -78,7 +78,7 @@ namespace BeatSaverSharp
         /// Does a map support Mapping Extensions effects?
         /// </summary>
         [QueryKeyName("me")]
-        public int? MappingExtensions { get; set; }
+        public bool? MappingExtensions { get; set; }
 
         /// <summary>
         /// The minimum BPM of a map.
