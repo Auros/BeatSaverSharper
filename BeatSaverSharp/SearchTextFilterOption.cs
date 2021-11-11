@@ -18,7 +18,7 @@ namespace BeatSaverSharp
         {
 
         }
-        
+
         public SearchTextFilterOption(string search)
         {
             Query = search;
@@ -136,6 +136,6 @@ namespace BeatSaverSharp
             {
                 Name = name;
             }
-        } 
+        }
     }
 }
