@@ -15,6 +15,7 @@
       A .NET library for interacting with the BeatSaver API.
     </Description>
     <PackageTags>beatsaber beatsaver</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
