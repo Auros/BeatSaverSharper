@@ -105,11 +105,24 @@ namespace BeatSaverSharp
 
                     foreach (var chunk in chunks)
                     {
-                        var newBeatmaps = await FetchBeatmaps("maps/hash/" + string.Join(",", chunk), token).ConfigureAwait(false);
-                        if (newBeatmaps == null) continue;
-                        foreach (var keyValuePair in newBeatmaps)
+                        var asList = chunk.ToList();
+                        if (asList.Count == 1)
                         {
-                            result.Add(keyValuePair.Key, keyValuePair.Value);
+                            var song = await BeatmapByHash(hash.First(), token);
+                            if (song != null)
+                            {
+                                result.Add(song.LatestVersion.Hash, song);
+                            }
+                        }
+                        else
+                        {
+                            var newBeatmaps = await FetchBeatmaps("maps/hash/" + string.Join(",", asList), token)
+                                .ConfigureAwait(false);
+                            if (newBeatmaps == null) continue;
+                            foreach (var keyValuePair in newBeatmaps)
+                            {
+                                result.Add(keyValuePair.Key, keyValuePair.Value);
+                            }
                         }
                     }
                 }
