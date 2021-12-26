@@ -25,8 +25,10 @@ namespace BeatSaverSharp.Tests
         public async Task TestMultiHash()
         {
             var results = await Client.BeatmapByHash(
-                "4529498dab9d920c1e7a3ba46507b677655b3ad7",
-                "701587ce2d1e502f8352c3cfd0627c1844b0ff0a"
+                new string[] {
+                    "4529498dab9d920c1e7a3ba46507b677655b3ad7",
+                    "701587ce2d1e502f8352c3cfd0627c1844b0ff0a"
+                }
             );
 
             // Kanaria - Envy Baby (Will Stetson Cover)

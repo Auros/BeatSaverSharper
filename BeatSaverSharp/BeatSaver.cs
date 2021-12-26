@@ -76,14 +76,9 @@ namespace BeatSaverSharp
             return await FetchBeatmap("maps/id/" + key, token).ConfigureAwait(false);
         }
 
-        public async Task<Dictionary<string, Beatmap>> BeatmapByHash(params string[] hash)
+        public async Task<Dictionary<string, Beatmap>> BeatmapByHash(string[] hashes, CancellationToken token = default, bool skipCacheCheck = false)
         {
-            return await BeatmapByHash(default, false, hash);
-        }
-
-        public async Task<Dictionary<string, Beatmap>> BeatmapByHash(CancellationToken token, bool skipCacheCheck, params string[] hash)
-        {
-            var grouped = hash.GroupBy(x => !skipCacheCheck && _fetchedBeatmaps.ContainsKey(x));
+            var grouped = hashes.GroupBy(x => !skipCacheCheck && _fetchedBeatmaps.ContainsKey(x));
             var result = new Dictionary<string, Beatmap>();
             foreach (var grouping in grouped)
             {
@@ -108,7 +103,7 @@ namespace BeatSaverSharp
                         var asList = chunk.ToList();
                         if (asList.Count == 1)
                         {
-                            var song = await BeatmapByHash(hash.First(), token);
+                            var song = await BeatmapByHash(asList.First(), token);
                             if (song != null)
                             {
                                 result.Add(song.LatestVersion.Hash, song);
