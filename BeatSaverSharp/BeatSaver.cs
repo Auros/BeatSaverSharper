@@ -76,6 +76,56 @@ namespace BeatSaverSharp
             return await FetchBeatmap("maps/id/" + key, token).ConfigureAwait(false);
         }
 
+        public async Task<Dictionary<string, Beatmap>> BeatmapByHash(string[] hashes, CancellationToken token = default, bool skipCacheCheck = false)
+        {
+            var grouped = hashes.GroupBy(x => !skipCacheCheck && _fetchedBeatmaps.ContainsKey(x));
+            var result = new Dictionary<string, Beatmap>();
+            foreach (var grouping in grouped)
+            {
+                if (grouping.Key)
+                {
+                    // In cache
+                    foreach (var s in grouping)
+                    {
+                        result.Add(s, _fetchedBeatmaps[s]);
+                    }
+                }
+                else
+                {
+                    // Maximum 50 hashes per request
+                    var chunks = grouping
+                        .Select((v, i) => new {v, groupIndex = i / 50})
+                        .GroupBy(x => x.groupIndex)
+                        .Select(g => g.Select(x => x.v));
+
+                    foreach (var chunk in chunks)
+                    {
+                        var asList = chunk.ToList();
+                        if (asList.Count == 1)
+                        {
+                            var song = await BeatmapByHash(asList.First(), token);
+                            if (song != null)
+                            {
+                                result.Add(song.LatestVersion.Hash, song);
+                            }
+                        }
+                        else
+                        {
+                            var newBeatmaps = await FetchBeatmaps("maps/hash/" + string.Join(",", asList), token)
+                                .ConfigureAwait(false);
+                            if (newBeatmaps == null) continue;
+                            foreach (var keyValuePair in newBeatmaps)
+                            {
+                                result.Add(keyValuePair.Key, keyValuePair.Value);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
         public async Task<Beatmap?> BeatmapByHash(string hash, CancellationToken token = default, bool skipCacheCheck = false)
         {
             if (string.IsNullOrWhiteSpace(hash))
@@ -95,6 +145,20 @@ namespace BeatSaverSharp
 
             Beatmap beatmap = await response.ReadAsObjectAsync<Beatmap>().ConfigureAwait(false);
             GetOrAddBeatmapToCache(beatmap, out beatmap);
+            return beatmap;
+        }
+
+        private async Task<Dictionary<string, Beatmap>?> FetchBeatmaps(string url, CancellationToken token = default)
+        {
+            var response = await _httpService.GetAsync(url, token).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+
+            Dictionary<string, Beatmap> beatmap = await response.ReadAsObjectAsync<Dictionary<string, Beatmap>>().ConfigureAwait(false);
+            foreach (var keyValuePair in beatmap)
+            {
+                GetOrAddBeatmapToCache(keyValuePair.Value, out _);
+            }
             return beatmap;
         }
 
