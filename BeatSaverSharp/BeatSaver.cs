@@ -29,7 +29,7 @@ namespace BeatSaverSharp
         private readonly ConcurrentDictionary<int, User> _fetchedUsers = new ConcurrentDictionary<int, User>();
         private readonly ConcurrentDictionary<string, User> _fetchedUsernames = new ConcurrentDictionary<string, User>();
         private readonly ConcurrentDictionary<string, Beatmap> _fetchedBeatmaps = new ConcurrentDictionary<string, Beatmap>();
-        private readonly ConcurrentDictionary<string, Beatmap> _fetchedHashedBeatmaps = new ConcurrentDictionary<string, Beatmap>();
+        private readonly ConcurrentDictionary<string, Beatmap> _fetchedHashedBeatmaps = new ConcurrentDictionary<string, Beatmap>(StringComparer.OrdinalIgnoreCase);
 
         static BeatSaver()
         {
@@ -106,7 +106,7 @@ namespace BeatSaverSharp
                             var song = await BeatmapByHash(asList.First(), token);
                             if (song != null)
                             {
-                                result[song.LatestVersion.Hash.ToUpperInvariant()] = song;
+                                result[song.LatestVersion.Hash] = song;
                             }
                         }
                         else
@@ -116,7 +116,7 @@ namespace BeatSaverSharp
                             if (newBeatmaps == null) continue;
                             foreach (var keyValuePair in newBeatmaps)
                             {
-                                result[keyValuePair.Key.ToUpperInvariant()] = keyValuePair.Value;
+                                result[keyValuePair.Key] = keyValuePair.Value;
                             }
                         }
                     }
@@ -130,7 +130,6 @@ namespace BeatSaverSharp
         {
             if (string.IsNullOrWhiteSpace(hash))
                 return null;
-            hash = hash.ToUpperInvariant();
 
             if (!skipCacheCheck && _fetchedHashedBeatmaps.TryGetValue(hash, out Beatmap? beatmap))
                 return beatmap;
@@ -474,12 +473,12 @@ namespace BeatSaverSharp
 
                     foreach (var version in beatmap.Versions)
                     {
-                        _fetchedHashedBeatmaps.TryAdd(version.Hash.ToUpperInvariant(), beatmap);
+                        _fetchedHashedBeatmaps.TryAdd(version.Hash, beatmap);
                     }
 
                     if (hash != null && !beatmap.Versions.Any(x => string.Equals(x.Hash, hash, StringComparison.OrdinalIgnoreCase)))
                     {
-                        _fetchedHashedBeatmaps.TryAdd(hash.ToUpperInvariant(), beatmap);
+                        _fetchedHashedBeatmaps.TryAdd(hash, beatmap);
                     }
 
                     PopulateWithClient(cachedAndOrBeatmap);
