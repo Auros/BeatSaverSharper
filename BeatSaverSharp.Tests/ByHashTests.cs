@@ -34,7 +34,7 @@ namespace BeatSaverSharp.Tests
             // Kanaria - Envy Baby (Will Stetson Cover)
             //  CoolingCloset & Nolanimations
             //  April 14th, 2021
-            var envyBaby = results["4529498dab9d920c1e7a3ba46507b677655b3ad7"];
+            var envyBaby = results["4529498DAB9D920C1E7A3BA46507B677655B3AD7"];
             Assert.IsNotNull(envyBaby);
             Assert.IsNotNull(envyBaby.Uploader);
 
@@ -44,7 +44,7 @@ namespace BeatSaverSharp.Tests
             // EGOIST - RELOADED (Short Ver.)
             //  CoolingCloset
             //  January 18th, 2021
-            var reloaded = results["701587ce2d1e502f8352c3cfd0627c1844b0ff0a"];
+            var reloaded = results["701587CE2D1E502F8352C3CFD0627C1844B0FF0A"];
             Assert.IsNotNull(reloaded);
             Assert.IsNotNull(reloaded.Uploader);
             Assert.IsNull(reloaded.Uploader.Stats);
