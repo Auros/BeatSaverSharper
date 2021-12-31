@@ -78,7 +78,7 @@ namespace BeatSaverSharp
 
         public async Task<Dictionary<string, Beatmap>> BeatmapByHash(string[] hashes, CancellationToken token = default, bool skipCacheCheck = false)
         {
-            var grouped = hashes.GroupBy(x => !skipCacheCheck && _fetchedBeatmaps.ContainsKey(x));
+            var grouped = hashes.GroupBy(x => !skipCacheCheck && _fetchedHashedBeatmaps.ContainsKey(x));
             var result = new Dictionary<string, Beatmap>();
             foreach (var grouping in grouped)
             {
@@ -87,7 +87,7 @@ namespace BeatSaverSharp
                     // In cache
                     foreach (var s in grouping)
                     {
-                        result.Add(s, _fetchedBeatmaps[s]);
+                        result.Add(s, _fetchedHashedBeatmaps[s]);
                     }
                 }
                 else
