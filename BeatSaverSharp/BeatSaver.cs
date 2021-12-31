@@ -477,7 +477,7 @@ namespace BeatSaverSharp
                         _fetchedHashedBeatmaps.TryAdd(version.Hash.ToUpperInvariant(), beatmap);
                     }
 
-                    if (hash != null && !beatmap.Versions.Any(x => string.Equals(x.Hash, hash, StringComparison.InvariantCultureIgnoreCase)))
+                    if (hash != null && !beatmap.Versions.Any(x => string.Equals(x.Hash, hash, StringComparison.OrdinalIgnoreCase)))
                     {
                         _fetchedHashedBeatmaps.TryAdd(hash.ToUpperInvariant(), beatmap);
                     }
