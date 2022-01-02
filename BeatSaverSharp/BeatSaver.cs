@@ -29,7 +29,7 @@ namespace BeatSaverSharp
         private readonly ConcurrentDictionary<int, User> _fetchedUsers = new ConcurrentDictionary<int, User>();
         private readonly ConcurrentDictionary<string, User> _fetchedUsernames = new ConcurrentDictionary<string, User>();
         private readonly ConcurrentDictionary<string, Beatmap> _fetchedBeatmaps = new ConcurrentDictionary<string, Beatmap>();
-        private readonly ConcurrentDictionary<string, Beatmap> _fetchedHashedBeatmaps = new ConcurrentDictionary<string, Beatmap>();
+        private readonly ConcurrentDictionary<string, Beatmap> _fetchedHashedBeatmaps = new ConcurrentDictionary<string, Beatmap>(StringComparer.OrdinalIgnoreCase);
 
         static BeatSaver()
         {
@@ -78,8 +78,8 @@ namespace BeatSaverSharp
 
         public async Task<Dictionary<string, Beatmap>> BeatmapByHash(string[] hashes, CancellationToken token = default, bool skipCacheCheck = false)
         {
-            var grouped = hashes.GroupBy(x => !skipCacheCheck && _fetchedBeatmaps.ContainsKey(x));
-            var result = new Dictionary<string, Beatmap>();
+            var grouped = hashes.Select(x => x.ToUpperInvariant()).Distinct().GroupBy(x => !skipCacheCheck && _fetchedHashedBeatmaps.ContainsKey(x));
+            var result = new Dictionary<string, Beatmap>(StringComparer.OrdinalIgnoreCase);
             foreach (var grouping in grouped)
             {
                 if (grouping.Key)
@@ -87,7 +87,7 @@ namespace BeatSaverSharp
                     // In cache
                     foreach (var s in grouping)
                     {
-                        result.Add(s, _fetchedBeatmaps[s]);
+                        result.Add(s, _fetchedHashedBeatmaps[s]);
                     }
                 }
                 else
@@ -106,7 +106,7 @@ namespace BeatSaverSharp
                             var song = await BeatmapByHash(asList.First(), token);
                             if (song != null)
                             {
-                                result.Add(song.LatestVersion.Hash, song);
+                                result[song.LatestVersion.Hash] = song;
                             }
                         }
                         else
@@ -116,7 +116,7 @@ namespace BeatSaverSharp
                             if (newBeatmaps == null) continue;
                             foreach (var keyValuePair in newBeatmaps)
                             {
-                                result.Add(keyValuePair.Key, keyValuePair.Value);
+                                result[keyValuePair.Key] = keyValuePair.Value;
                             }
                         }
                     }
@@ -130,21 +130,20 @@ namespace BeatSaverSharp
         {
             if (string.IsNullOrWhiteSpace(hash))
                 return null;
-            hash = hash.ToUpperInvariant();
 
             if (!skipCacheCheck && _fetchedHashedBeatmaps.TryGetValue(hash, out Beatmap? beatmap))
                 return beatmap;
-            return await FetchBeatmap("maps/hash/" + hash, token).ConfigureAwait(false);
+            return await FetchBeatmap("maps/hash/" + hash, token, hash).ConfigureAwait(false);
         }
 
-        private async Task<Beatmap?> FetchBeatmap(string url, CancellationToken token = default)
+        private async Task<Beatmap?> FetchBeatmap(string url, CancellationToken token = default, string? hash = null)
         {
             var response = await _httpService.GetAsync(url, token).ConfigureAwait(false);
             if (!response.Successful)
                 return null;
 
             Beatmap beatmap = await response.ReadAsObjectAsync<Beatmap>().ConfigureAwait(false);
-            GetOrAddBeatmapToCache(beatmap, out beatmap);
+            GetOrAddBeatmapToCache(beatmap, out beatmap, hash);
             return beatmap;
         }
 
@@ -157,7 +156,7 @@ namespace BeatSaverSharp
             Dictionary<string, Beatmap> beatmap = await response.ReadAsObjectAsync<Dictionary<string, Beatmap>>().ConfigureAwait(false);
             foreach (var keyValuePair in beatmap)
             {
-                GetOrAddBeatmapToCache(keyValuePair.Value, out _);
+                GetOrAddBeatmapToCache(keyValuePair.Value, out _, keyValuePair.Key);
             }
             return beatmap;
         }
@@ -417,8 +416,9 @@ namespace BeatSaverSharp
         /// </summary>
         /// <param name="beatmap">The beatmap to get or add.</param>
         /// <param name="cachedAndOrBeatmap">The added or fetched Beatmap</param>
+        /// <param name="hash">The hash used to find this beatmap if different from that returned</param>
         /// <returns>Returns true if it was added. Returns false if it was already cached.</returns>
-        private bool GetOrAddBeatmapToCache(Beatmap beatmap, out Beatmap cachedAndOrBeatmap)
+        private bool GetOrAddBeatmapToCache(Beatmap beatmap, out Beatmap cachedAndOrBeatmap, string? hash = null)
         {
             if (!_options.Cache)
             {
@@ -474,6 +474,11 @@ namespace BeatSaverSharp
                     foreach (var version in beatmap.Versions)
                     {
                         _fetchedHashedBeatmaps.TryAdd(version.Hash, beatmap);
+                    }
+
+                    if (hash != null && !beatmap.Versions.Any(x => string.Equals(x.Hash, hash, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        _fetchedHashedBeatmaps.TryAdd(hash, beatmap);
                     }
 
                     PopulateWithClient(cachedAndOrBeatmap);
