@@ -434,9 +434,6 @@ namespace BeatSaverSharp
                     if (beatmap.Automapper != cachedBeatmap.Automapper)
                         cachedBeatmap.Automapper = beatmap.Automapper;
 
-                    if (beatmap.Curator != cachedBeatmap.Curator)
-                        cachedBeatmap.Curator = beatmap.Curator;
-
                     if (beatmap.Description != cachedBeatmap.Description)
                         cachedBeatmap.Description = beatmap.Description;
 
