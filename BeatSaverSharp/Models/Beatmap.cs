@@ -81,7 +81,7 @@ namespace BeatSaverSharp.Models
         /// The person who curated this map.
         /// </summary>
         [JsonProperty("curator")]
-        public string? Curator { get; internal set; }
+        public Curator? Curator { get; internal set; }
 
         private BeatmapVersion? _latestVersion;
 
