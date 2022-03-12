@@ -297,20 +297,19 @@ namespace BeatSaverSharp
                 options = new UploadedPlaylistFilterOptions();
             StringBuilder sb = new StringBuilder();
             sb.Append("playlists/latest");
+            
+            var sort = options.Sort.HasValue ? options.Sort.Value switch
+            {
+                LatestPlaylistFilterSort.CREATED => "CREATED",
+                LatestPlaylistFilterSort.UPDATED => "UPDATED",
+                _ => "SONGS_UPDATED",
+            } : "CREATED";
+            sb.Append("?sort=").Append(sort);
+            
             if (options.StartDate.HasValue)
                 sb.Append("&before=").Append(options.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
             if (options.Before.HasValue)
                 sb.Append("&after=").Append(options.Before.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
-            if (options.Sort.HasValue)
-            {
-                var sort = options.Sort.Value switch
-                {
-                    LatestPlaylistFilterSort.CREATED => "CREATED",
-                    LatestPlaylistFilterSort.UPDATED => "UPDATED",
-                    _ => "SONGS_UPDATED",
-                };
-                sb.Append("&sort=").Append(sort);
-            }
 
             var result = await GetPlaylistsFromPage(sb.ToString(), token).ConfigureAwait(false);
             if (result is null)

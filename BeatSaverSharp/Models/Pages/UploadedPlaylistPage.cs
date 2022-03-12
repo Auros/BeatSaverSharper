@@ -47,7 +47,7 @@ namespace BeatSaverSharp.Models.Pages
                 case LatestPlaylistFilterSort.UPDATED:
                     return playlist.UpdatedAt;
                 case LatestPlaylistFilterSort.SONGS_UPDATED:
-                    return playlist.SongsChangedAt;
+                    return playlist.SongsChangedAt ?? playlist.UpdatedAt;
             }
             return playlist.CreatedAt;
         }

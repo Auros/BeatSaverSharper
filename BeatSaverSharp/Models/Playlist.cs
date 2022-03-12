@@ -69,7 +69,7 @@ namespace BeatSaverSharp.Models
         /// The last time one of the songs in the playlist was updated.
         /// </summary>
         [JsonProperty("songsChangedAt")]
-        public DateTime SongsChangedAt { get; internal set; }
+        public DateTime? SongsChangedAt { get; internal set; }
         
         /// <summary>
         /// The time at which the playlist was last updated.
