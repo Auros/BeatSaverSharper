@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace BeatSaverSharp.Models.Pages
 {
-    internal class SerializablePlaylistPage
+    internal class SerializablePlaylistDetail
     {
         [JsonProperty("maps")]
         public ReadOnlyCollection<OrderedBeatmap> Beatmaps { get; internal set; } = null!;

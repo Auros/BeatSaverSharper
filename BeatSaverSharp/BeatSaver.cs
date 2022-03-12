@@ -264,7 +264,7 @@ namespace BeatSaverSharp
 
 #region Playlists
 
-        public async Task<PlaylistPage?> Playlist(int id, CancellationToken token = default, int page = 0, bool skipCacheCheck = false)
+        public async Task<PlaylistDetail?> Playlist(int id, CancellationToken token = default, int page = 0, bool skipCacheCheck = false)
         {
             var playlistURL = $"/playlists/id/{id}/{page}";
             
@@ -272,7 +272,7 @@ namespace BeatSaverSharp
             if (!response.Successful)
                 return null;
 
-            var result = await response.ReadAsObjectAsync<SerializablePlaylistPage>().ConfigureAwait(false);
+            var result = await response.ReadAsObjectAsync<SerializablePlaylistDetail>().ConfigureAwait(false);
 
             GetOrAddPlaylistToCache(result.Playlist, out var playlist);
 
@@ -284,11 +284,11 @@ namespace BeatSaverSharp
             }
             var beatmaps = new ReadOnlyCollection<OrderedBeatmap>(beatmapList);
 
-            var playlistPage = new PlaylistPage(page, playlist, beatmaps)
+            var playlistDetail = new PlaylistDetail(page, playlist, beatmaps)
             {
                 Client = this
             };
-            return playlistPage;
+            return playlistDetail;
         }
         
         public async Task<PlaylistSearchPage?> SearchPlaylists(SearchTextPlaylistFilterOptions? searchOptions = default, int page = 0, CancellationToken token = default)
