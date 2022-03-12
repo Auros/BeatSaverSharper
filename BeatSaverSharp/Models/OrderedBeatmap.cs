@@ -14,6 +14,14 @@ namespace BeatSaverSharp.Models
         [JsonProperty("order")]
         public float Order { get; internal set; }
         
+        public OrderedBeatmap(){}
+
+        public OrderedBeatmap(Beatmap map, float order)
+        {
+            Map = map;
+            Order = order;
+        }
+        
         #region Equality & Comparison
 
         public bool Equals(OrderedBeatmap? other) => Map.Equals(other?.Map);

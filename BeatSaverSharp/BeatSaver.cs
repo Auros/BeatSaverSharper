@@ -25,11 +25,13 @@ namespace BeatSaverSharp
         private readonly IHttpService _httpService;
         private readonly object _bLock = new object();
         private readonly object _uLock = new object();
+        private readonly object _pLock = new object();
         private static readonly (string, PropertyInfo)[] _filterProperties;
         private readonly ConcurrentDictionary<int, User> _fetchedUsers = new ConcurrentDictionary<int, User>();
         private readonly ConcurrentDictionary<string, User> _fetchedUsernames = new ConcurrentDictionary<string, User>();
         private readonly ConcurrentDictionary<string, Beatmap> _fetchedBeatmaps = new ConcurrentDictionary<string, Beatmap>();
         private readonly ConcurrentDictionary<string, Beatmap> _fetchedHashedBeatmaps = new ConcurrentDictionary<string, Beatmap>(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<int, Playlist> _fetchedPlaylists = new ConcurrentDictionary<int, Playlist>();
 
         static BeatSaver()
         {
@@ -252,6 +254,37 @@ namespace BeatSaverSharp
 
 #endregion
 
+#region Playlists
+
+        public async Task<PlaylistPage?> Playlist(int id, CancellationToken token = default, int page = 0, bool skipCacheCheck = false)
+        {
+            var playlistURL = $"/playlists/id/{id}/{page}";
+            
+            var response = await _httpService.GetAsync(playlistURL, token).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+
+            var result = await response.ReadAsObjectAsync<SerializablePlaylistPage>().ConfigureAwait(false);
+
+            GetOrAddPlaylistToCache(result.Playlist, out var playlist);
+
+            var beatmapList = new List<OrderedBeatmap>();
+            foreach (var beatmap in result.Beatmaps)
+            {
+                GetOrAddBeatmapToCache(beatmap.Map, out Beatmap selfOrCached);
+                beatmapList.Add(new OrderedBeatmap(selfOrCached, beatmap.Order));
+            }
+            var beatmaps = new ReadOnlyCollection<OrderedBeatmap>(beatmapList);
+
+            var playlistPage = new PlaylistPage(page, playlist, beatmaps)
+            {
+                Client = this
+            };
+            return playlistPage;
+        }
+
+#endregion
+
 #region Users
 
         public async Task<User?> User(int id, CancellationToken token = default, bool skipCacheCheck = false)
@@ -385,6 +418,11 @@ namespace BeatSaverSharp
             if (_fetchedHashedBeatmaps.Count > _options.MaximumCacheSize)
             {
                 _fetchedHashedBeatmaps.TryRemove(_fetchedHashedBeatmaps.Keys.GetEnumerator().Current, out _);
+            }
+
+            if (_fetchedPlaylists.Count > _options.MaximumCacheSize)
+            {
+                _fetchedPlaylists.TryRemove(_fetchedPlaylists.Keys.GetEnumerator().Current, out _);
             }
         }
 
@@ -540,6 +578,58 @@ namespace BeatSaverSharp
 
                     if (!cachedAndOrUser.HasClient)
                         cachedAndOrUser.Client = this;
+                    return true;
+                }
+            }
+        }
+
+        private bool GetOrAddPlaylistToCache(Playlist playlist, out Playlist cachedAndOrPlaylist)
+        {
+            if (!_options.Cache)
+            {
+                cachedAndOrPlaylist = playlist;
+                return false;
+            }
+            ProcessCache();
+
+            lock (_pLock)
+            {
+                if (_fetchedPlaylists.TryGetValue(playlist.ID, out Playlist? cachedPlaylist))
+                {
+                    if (playlist.CreatedAt != cachedPlaylist.CreatedAt)
+                        cachedPlaylist.CreatedAt = playlist.CreatedAt;
+                    
+                    if (playlist.CuratedAt != cachedPlaylist.CuratedAt)
+                        cachedPlaylist.CuratedAt = playlist.CuratedAt;
+                    
+                    if (!ReferenceEquals(playlist.Curator, null) && !playlist.Curator.Equals(cachedPlaylist.Curator))
+                        cachedPlaylist.Curator = playlist.Curator;
+                    
+                    if (playlist.DeletedAt != cachedPlaylist.DeletedAt)
+                        cachedPlaylist.DeletedAt = playlist.DeletedAt;
+                    
+                    if (playlist.Description != cachedPlaylist.Description)
+                        cachedPlaylist.Description = playlist.Description;
+                    
+                    if (playlist.Name != cachedPlaylist.Name)
+                        cachedPlaylist.Name = playlist.Name;
+                    
+                    if (playlist.Public != cachedPlaylist.Public)
+                        cachedPlaylist.Public = playlist.Public;
+                    
+                    if (playlist.SongsChangedAt != cachedPlaylist.SongsChangedAt)
+                        cachedPlaylist.SongsChangedAt = playlist.SongsChangedAt;
+                    
+                    if (playlist.UpdatedAt != cachedPlaylist.UpdatedAt)
+                        cachedPlaylist.UpdatedAt = playlist.UpdatedAt;
+                    
+                    cachedAndOrPlaylist = cachedPlaylist;
+                    return false;
+                }
+                else
+                {
+                    _fetchedPlaylists.TryAdd(playlist.ID, playlist);
+                    cachedAndOrPlaylist = playlist;
                     return true;
                 }
             }
