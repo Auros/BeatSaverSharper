@@ -126,16 +126,5 @@ namespace BeatSaverSharp
         /// End the search after this date.
         /// </summary>
         public DateTime? To { get; set; }
-
-        [AttributeUsage(AttributeTargets.Property)]
-        internal class QueryKeyNameAttribute : Attribute
-        {
-            public string Name { get; }
-
-            public QueryKeyNameAttribute(string name)
-            {
-                Name = name;
-            }
-        }
     }
 }
