@@ -32,5 +32,12 @@ namespace BeatSaverSharp.Http
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         Task<T> ReadAsObjectAsync<T>() where T : class;
+
+        /// <summary>
+        /// Reads the body and deserializes it into an existing object.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        Task PopulateObjectAsync(object target);
     }
 }
