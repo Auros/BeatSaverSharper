@@ -27,6 +27,7 @@ namespace BeatSaverSharp
         private readonly object _uLock = new object();
         private readonly object _pLock = new object();
         private static readonly (string, PropertyInfo)[] _filterProperties;
+        private static readonly (string, PropertyInfo)[] _playlistFilterProperties;
         private readonly ConcurrentDictionary<int, User> _fetchedUsers = new ConcurrentDictionary<int, User>();
         private readonly ConcurrentDictionary<string, User> _fetchedUsernames = new ConcurrentDictionary<string, User>();
         private readonly ConcurrentDictionary<string, Beatmap> _fetchedBeatmaps = new ConcurrentDictionary<string, Beatmap>();
@@ -35,15 +36,22 @@ namespace BeatSaverSharp
 
         static BeatSaver()
         {
+            _filterProperties = PropertiesForFilter<SearchTextFilterOption>();
+            _playlistFilterProperties = PropertiesForFilter<SearchTextPlaylistFilterOptions>();
+        }
+
+        private static (string, PropertyInfo)[] PropertiesForFilter<T>()
+        {
             // We cache the reflection properties and their names.
-            var properties = typeof(SearchTextFilterOption).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            _filterProperties = new (string, PropertyInfo)[properties.Length];
+            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var filterProperties = new (string, PropertyInfo)[properties.Length];
             for (int i = 0; i < properties.Length; i++)
             {
                 var activeProperty = properties[i];
-                var queryKeyName = activeProperty.GetCustomAttribute<SearchTextFilterOption.QueryKeyNameAttribute>();
-                _filterProperties[i] = (queryKeyName?.Name ?? activeProperty.Name, activeProperty);
+                var queryKeyName = activeProperty.GetCustomAttribute<QueryKeyNameAttribute>();
+                filterProperties[i] = (queryKeyName?.Name ?? activeProperty.Name, activeProperty);
             }
+            return filterProperties;
         }
 
         public BeatSaver(BeatSaverOptions beatSaverOptions)
@@ -282,6 +290,46 @@ namespace BeatSaverSharp
             };
             return playlistPage;
         }
+        
+        public async Task<PlaylistSearchPage?> SearchPlaylists(SearchTextPlaylistFilterOptions? searchOptions = default, int page = 0, CancellationToken token = default)
+        {
+            string searchURL = $"playlists/search/{page}";
+
+            if (searchOptions != null)
+            {
+                List<string> queryProps = new List<string>();
+                foreach (var property in _playlistFilterProperties)
+                {
+                    var filterValue = property.Item2.GetValue(searchOptions);
+                    if (filterValue != null)
+                    {
+                        // DateTimes need to be formatted to conform to ISO
+                        if (filterValue is DateTime dateTime)
+                            filterValue = dateTime.ToString("yyyy-MM-ddTHH:mm:ssZ"); // yyyy-MM-dd
+
+                        var encoded = HttpUtility.UrlEncode(filterValue.ToString(), Encoding.Default);
+                        queryProps.Add($"{property.Item1}={encoded}");
+                    }
+                }
+
+                // Aggregating an empty list == exception 
+                if (queryProps.Count != 0)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append('?').Append(queryProps.Aggregate((a, b) => $"{a}&{b}"));
+                    searchURL += sb.ToString();
+                }
+            }
+
+            var result = await GetPlaylistsFromPage(searchURL, token).ConfigureAwait(false);
+            if (result is null)
+                return null;
+
+            return new PlaylistSearchPage(page, searchOptions, result)
+            {
+                Client = this
+            };
+        }
 
 #endregion
 
@@ -447,6 +495,26 @@ namespace BeatSaverSharp
             }
 
             return new ReadOnlyCollection<Beatmap>(beatmapList);
+        }
+
+        private async Task<IReadOnlyList<Playlist>?> GetPlaylistsFromPage(string url, CancellationToken token = default)
+        {
+            var response = await _httpService.GetAsync(url, token).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+
+            var page = await response.ReadAsObjectAsync<SerializablePlaylistSearch>().ConfigureAwait(false);
+            if (page.Docs.Count == 0)
+                return null;
+            
+            List<Playlist> playlists = new List<Playlist>();
+            foreach (var playlist in page.Docs)
+            {
+                GetOrAddPlaylistToCache(playlist, out var selfOrCached);
+                playlists.Add(selfOrCached);
+            }
+
+            return new ReadOnlyCollection<Playlist>(playlists);
         }
 
         /// <summary>
