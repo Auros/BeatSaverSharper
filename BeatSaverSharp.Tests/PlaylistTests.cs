@@ -16,20 +16,20 @@ namespace BeatSaverSharp.Tests
             var iLoveRem = await Client.Playlist(23);
             Assert.IsNotNull(iLoveRem);
             Assert.IsFalse(iLoveRem.Empty);
-            Assert.IsNotNull(iLoveRem._playlist.Owner);
+            Assert.IsNotNull(iLoveRem.Playlist.Owner);
             // Please do not uncurate this Helen
-            Assert.IsNotNull(iLoveRem._playlist.Curator);
+            Assert.IsNotNull(iLoveRem.Playlist.Curator);
             
             // Testing going forward
             var whoIsRem = await iLoveRem.Next();
             Assert.IsNotNull(whoIsRem);
-            Assert.IsTrue(iLoveRem._playlist.Equals(whoIsRem._playlist));
+            Assert.IsTrue(iLoveRem.Playlist.Equals(whoIsRem.Playlist));
             Assert.IsTrue(whoIsRem.Empty);
             
             // And back
             var iRember = await whoIsRem.Previous();
             Assert.IsNotNull(iRember);
-            Assert.IsTrue(iLoveRem._playlist.Equals(iRember._playlist));
+            Assert.IsTrue(iLoveRem.Playlist.Equals(iRember.Playlist));
             Assert.IsFalse(iRember.Empty);
         }
     }
