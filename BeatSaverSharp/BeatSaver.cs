@@ -291,7 +291,7 @@ namespace BeatSaverSharp
             return playlistDetail;
         }
         
-        public async Task<PlaylistSearchPage?> SearchPlaylists(SearchTextPlaylistFilterOptions? searchOptions = default, int page = 0, CancellationToken token = default)
+        public async Task<PlaylistPage?> SearchPlaylists(SearchTextPlaylistFilterOptions? searchOptions = default, int page = 0, CancellationToken token = default)
         {
             string searchURL = $"playlists/search/{page}";
 
