@@ -291,6 +291,37 @@ namespace BeatSaverSharp
             return playlistDetail;
         }
         
+        public async Task<PlaylistPage?> LatestPlaylists(UploadedPlaylistFilterOptions? options = default, CancellationToken token = default)
+        {
+            if (options == null)
+                options = new UploadedPlaylistFilterOptions();
+            StringBuilder sb = new StringBuilder();
+            sb.Append("playlists/latest");
+            if (options.StartDate.HasValue)
+                sb.Append("&before=").Append(options.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+            if (options.Before.HasValue)
+                sb.Append("&after=").Append(options.Before.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+            if (options.Sort.HasValue)
+            {
+                var sort = options.Sort.Value switch
+                {
+                    LatestPlaylistFilterSort.CREATED => "CREATED",
+                    LatestPlaylistFilterSort.UPDATED => "UPDATED",
+                    _ => "SONGS_UPDATED",
+                };
+                sb.Append("&sort=").Append(sort);
+            }
+
+            var result = await GetPlaylistsFromPage(sb.ToString(), token).ConfigureAwait(false);
+            if (result is null)
+                return null;
+
+            return new UploadedPlaylistPage(options, result)
+            {
+                Client = this
+            };
+        }
+        
         public async Task<PlaylistPage?> SearchPlaylists(SearchTextPlaylistFilterOptions? searchOptions = default, int page = 0, CancellationToken token = default)
         {
             string searchURL = $"playlists/search/{page}";
