@@ -2,11 +2,17 @@
 
 namespace BeatSaverSharp
 {
+    /// <summary>
+    /// Options for filtering playlists through BeatSaver. All properties are nullable by default. Setting one to a value
+    /// will make it so maps have to meet that value. For example, setting Curated to true will return only curated playlists.
+    /// Setting it to false will make it so curated playlists are never returned. Setting it to null will include all playlists,
+    /// whether they are curated or not.
+    /// </summary>
     public class SearchTextPlaylistFilterOptions
     {
-        public static SearchTextFilterOption Latest => new SearchTextFilterOption { SortOrder = SortingOptions.Latest };
-        public static SearchTextFilterOption Rating => new SearchTextFilterOption { SortOrder = SortingOptions.Rating };
-        public static SearchTextFilterOption Relevance => new SearchTextFilterOption { SortOrder = SortingOptions.Relevance };
+        public static SearchTextPlaylistFilterOptions Latest => new SearchTextPlaylistFilterOptions { SortOrder = SortingOptions.Latest };
+        public static SearchTextPlaylistFilterOptions Rating => new SearchTextPlaylistFilterOptions { SortOrder = SortingOptions.Rating };
+        public static SearchTextPlaylistFilterOptions Relevance => new SearchTextPlaylistFilterOptions { SortOrder = SortingOptions.Relevance };
 
         public SearchTextPlaylistFilterOptions() { }
 
@@ -26,13 +32,13 @@ namespace BeatSaverSharp
         public DateTime? To { get; set; }
         
         /// <summary>
-        /// Show only curated playlists
+        /// Is a playlist curated
         /// </summary>
         [QueryKeyName("curated")]
         public bool Curated { get; set; }
         
         /// <summary>
-        /// If empty playlists should be included or not
+        /// Include empty playlists.
         /// </summary>
         [QueryKeyName("includeEmpty")]
         public bool IncludeEmpty { get; set; }
