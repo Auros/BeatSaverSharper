@@ -35,6 +35,30 @@ namespace BeatSaverSharp.Tests
         }
         
         [TestMethod]
+        public async Task TestPaging()
+        {
+            var latestPage = await Client.SearchPlaylists(SearchTextPlaylistFilterOptions.Latest);
+            Assert.IsNotNull(latestPage);
+
+            // There better be playlists on the latest curator page.
+            Assert.IsFalse(latestPage.Empty);
+
+            var nextPage = await latestPage.Next();
+            Assert.IsNotNull(nextPage);
+
+            // And there BETTER be playlists on the next page.
+            Assert.IsFalse(latestPage.Empty);
+
+            // Now we check to see if they're in the right order
+            Assert.IsTrue(latestPage.Playlists[latestPage.Playlists.Count - 1].CreatedAt >= nextPage.Playlists[0].CreatedAt);
+
+            // And now we test is the previous page is the same as the first.
+            var previousPage = await nextPage.Previous();
+            Assert.IsNotNull(previousPage);
+            CollectionAssert.AreEqual(latestPage.Playlists.ToList(), previousPage.Playlists.ToList());
+        }
+        
+        [TestMethod]
         public async Task TestLatest()
         {
             var latestPage = await Client.LatestPlaylists();
