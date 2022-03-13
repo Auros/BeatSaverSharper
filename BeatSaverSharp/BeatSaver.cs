@@ -25,23 +25,33 @@ namespace BeatSaverSharp
         private readonly IHttpService _httpService;
         private readonly object _bLock = new object();
         private readonly object _uLock = new object();
+        private readonly object _pLock = new object();
         private static readonly (string, PropertyInfo)[] _filterProperties;
+        private static readonly (string, PropertyInfo)[] _playlistFilterProperties;
         private readonly ConcurrentDictionary<int, User> _fetchedUsers = new ConcurrentDictionary<int, User>();
         private readonly ConcurrentDictionary<string, User> _fetchedUsernames = new ConcurrentDictionary<string, User>();
         private readonly ConcurrentDictionary<string, Beatmap> _fetchedBeatmaps = new ConcurrentDictionary<string, Beatmap>();
         private readonly ConcurrentDictionary<string, Beatmap> _fetchedHashedBeatmaps = new ConcurrentDictionary<string, Beatmap>(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<int, Playlist> _fetchedPlaylists = new ConcurrentDictionary<int, Playlist>();
 
         static BeatSaver()
         {
+            _filterProperties = PropertiesForFilter<SearchTextFilterOption>();
+            _playlistFilterProperties = PropertiesForFilter<SearchTextPlaylistFilterOptions>();
+        }
+
+        private static (string, PropertyInfo)[] PropertiesForFilter<T>()
+        {
             // We cache the reflection properties and their names.
-            var properties = typeof(SearchTextFilterOption).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            _filterProperties = new (string, PropertyInfo)[properties.Length];
+            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var filterProperties = new (string, PropertyInfo)[properties.Length];
             for (int i = 0; i < properties.Length; i++)
             {
                 var activeProperty = properties[i];
-                var queryKeyName = activeProperty.GetCustomAttribute<SearchTextFilterOption.QueryKeyNameAttribute>();
-                _filterProperties[i] = (queryKeyName?.Name ?? activeProperty.Name, activeProperty);
+                var queryKeyName = activeProperty.GetCustomAttribute<QueryKeyNameAttribute>();
+                filterProperties[i] = (queryKeyName?.Name ?? activeProperty.Name, activeProperty);
             }
+            return filterProperties;
         }
 
         public BeatSaver(BeatSaverOptions beatSaverOptions)
@@ -65,7 +75,7 @@ namespace BeatSaverSharp
 
         }
 
-#region Beatmaps
+        #region Beatmaps
 
         public async Task<Beatmap?> Beatmap(string key, CancellationToken token = default, bool skipCacheCheck = false)
         {
@@ -94,7 +104,7 @@ namespace BeatSaverSharp
                 {
                     // Maximum 50 hashes per request
                     var chunks = grouping
-                        .Select((v, i) => new {v, groupIndex = i / 50})
+                        .Select((v, i) => new { v, groupIndex = i / 50 })
                         .GroupBy(x => x.groupIndex)
                         .Select(g => g.Select(x => x.v));
 
@@ -161,9 +171,9 @@ namespace BeatSaverSharp
             return beatmap;
         }
 
-#endregion
+        #endregion
 
-#region Paged Beatmaps
+        #region Paged Beatmaps
 
         public async Task<Page?> LatestBeatmaps(UploadedFilterOptions? options = default, CancellationToken token = default)
         {
@@ -250,9 +260,110 @@ namespace BeatSaverSharp
             };
         }
 
-#endregion
+        #endregion
 
-#region Users
+        #region Playlists
+
+        public async Task<PlaylistDetail?> Playlist(int id, CancellationToken token = default, int page = 0, bool skipCacheCheck = false)
+        {
+            var playlistURL = $"/playlists/id/{id}/{page}";
+
+            var response = await _httpService.GetAsync(playlistURL, token).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+
+            var result = await response.ReadAsObjectAsync<SerializablePlaylistDetail>().ConfigureAwait(false);
+
+            GetOrAddPlaylistToCache(result.Playlist, out var playlist);
+
+            var beatmapList = new List<OrderedBeatmap>();
+            foreach (var beatmap in result.Beatmaps)
+            {
+                GetOrAddBeatmapToCache(beatmap.Map, out Beatmap selfOrCached);
+                beatmapList.Add(new OrderedBeatmap(selfOrCached, beatmap.Order));
+            }
+            var beatmaps = new ReadOnlyCollection<OrderedBeatmap>(beatmapList);
+
+            var playlistDetail = new PlaylistDetail(page, playlist, beatmaps)
+            {
+                Client = this
+            };
+            return playlistDetail;
+        }
+
+        public async Task<PlaylistPage?> LatestPlaylists(UploadedPlaylistFilterOptions? options = default, CancellationToken token = default)
+        {
+            if (options == null)
+                options = new UploadedPlaylistFilterOptions();
+            StringBuilder sb = new StringBuilder();
+            sb.Append("playlists/latest");
+
+            var sort = options.Sort.HasValue ? options.Sort.Value switch
+            {
+                LatestPlaylistFilterSort.CREATED => "CREATED",
+                LatestPlaylistFilterSort.UPDATED => "UPDATED",
+                _ => "SONGS_UPDATED",
+            } : "CREATED";
+            sb.Append("?sort=").Append(sort);
+
+            if (options.StartDate.HasValue)
+                sb.Append("&before=").Append(options.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+            if (options.Before.HasValue)
+                sb.Append("&after=").Append(options.Before.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+
+            var result = await GetPlaylistsFromPage(sb.ToString(), token).ConfigureAwait(false);
+            if (result is null)
+                return null;
+
+            return new UploadedPlaylistPage(options, result)
+            {
+                Client = this
+            };
+        }
+
+        public async Task<PlaylistPage?> SearchPlaylists(SearchTextPlaylistFilterOptions? searchOptions = default, int page = 0, CancellationToken token = default)
+        {
+            string searchURL = $"playlists/search/{page}";
+
+            if (searchOptions != null)
+            {
+                List<string> queryProps = new List<string>();
+                foreach (var property in _playlistFilterProperties)
+                {
+                    var filterValue = property.Item2.GetValue(searchOptions);
+                    if (filterValue != null)
+                    {
+                        // DateTimes need to be formatted to conform to ISO
+                        if (filterValue is DateTime dateTime)
+                            filterValue = dateTime.ToString("yyyy-MM-ddTHH:mm:ssZ"); // yyyy-MM-dd
+
+                        var encoded = HttpUtility.UrlEncode(filterValue.ToString(), Encoding.Default);
+                        queryProps.Add($"{property.Item1}={encoded}");
+                    }
+                }
+
+                // Aggregating an empty list == exception 
+                if (queryProps.Count != 0)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append('?').Append(queryProps.Aggregate((a, b) => $"{a}&{b}"));
+                    searchURL += sb.ToString();
+                }
+            }
+
+            var result = await GetPlaylistsFromPage(searchURL, token).ConfigureAwait(false);
+            if (result is null)
+                return null;
+
+            return new PlaylistSearchPage(page, searchOptions, result)
+            {
+                Client = this
+            };
+        }
+
+        #endregion
+
+        #region Users
 
         public async Task<User?> User(int id, CancellationToken token = default, bool skipCacheCheck = false)
         {
@@ -295,9 +406,9 @@ namespace BeatSaverSharp
             return user;
         }
 
-#endregion
+        #endregion
 
-#region Voting
+        #region Voting
 
         /// <summary>
         /// Submits a vote on a map.
@@ -332,9 +443,9 @@ namespace BeatSaverSharp
             return await response.ReadAsObjectAsync<VoteResponse>().ConfigureAwait(false);
         }
 
-#endregion
+        #endregion
 
-#region Byte Fetching
+        #region Byte Fetching
 
         internal async Task<byte[]?> DownloadZIP(BeatmapVersion version, CancellationToken token = default, IProgress<double>? progress = null)
         {
@@ -360,7 +471,7 @@ namespace BeatSaverSharp
             return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
 
-#endregion
+        #endregion
 
         private void ProcessCache()
         {
@@ -386,6 +497,11 @@ namespace BeatSaverSharp
             {
                 _fetchedHashedBeatmaps.TryRemove(_fetchedHashedBeatmaps.Keys.GetEnumerator().Current, out _);
             }
+
+            if (_fetchedPlaylists.Count > _options.MaximumCacheSize)
+            {
+                _fetchedPlaylists.TryRemove(_fetchedPlaylists.Keys.GetEnumerator().Current, out _);
+            }
         }
 
         private async Task<IReadOnlyList<Beatmap>?> GetBeatmapsFromPage(string url, CancellationToken token = default)
@@ -409,6 +525,26 @@ namespace BeatSaverSharp
             }
 
             return new ReadOnlyCollection<Beatmap>(beatmapList);
+        }
+
+        private async Task<IReadOnlyList<Playlist>?> GetPlaylistsFromPage(string url, CancellationToken token = default)
+        {
+            var response = await _httpService.GetAsync(url, token).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+
+            var page = await response.ReadAsObjectAsync<SerializablePlaylistSearch>().ConfigureAwait(false);
+            if (page.Docs.Count == 0)
+                return null;
+
+            List<Playlist> playlists = new List<Playlist>();
+            foreach (var playlist in page.Docs)
+            {
+                GetOrAddPlaylistToCache(playlist, out var selfOrCached);
+                playlists.Add(selfOrCached);
+            }
+
+            return new ReadOnlyCollection<Playlist>(playlists);
         }
 
         /// <summary>
@@ -540,6 +676,58 @@ namespace BeatSaverSharp
 
                     if (!cachedAndOrUser.HasClient)
                         cachedAndOrUser.Client = this;
+                    return true;
+                }
+            }
+        }
+
+        private bool GetOrAddPlaylistToCache(Playlist playlist, out Playlist cachedAndOrPlaylist)
+        {
+            if (!_options.Cache)
+            {
+                cachedAndOrPlaylist = playlist;
+                return false;
+            }
+            ProcessCache();
+
+            lock (_pLock)
+            {
+                if (_fetchedPlaylists.TryGetValue(playlist.ID, out Playlist? cachedPlaylist))
+                {
+                    if (playlist.CreatedAt != cachedPlaylist.CreatedAt)
+                        cachedPlaylist.CreatedAt = playlist.CreatedAt;
+
+                    if (playlist.CuratedAt != cachedPlaylist.CuratedAt)
+                        cachedPlaylist.CuratedAt = playlist.CuratedAt;
+
+                    if (playlist.Curator is object && !playlist.Curator.Equals(cachedPlaylist.Curator))
+                        cachedPlaylist.Curator = playlist.Curator;
+
+                    if (playlist.DeletedAt != cachedPlaylist.DeletedAt)
+                        cachedPlaylist.DeletedAt = playlist.DeletedAt;
+
+                    if (playlist.Description != cachedPlaylist.Description)
+                        cachedPlaylist.Description = playlist.Description;
+
+                    if (playlist.Name != cachedPlaylist.Name)
+                        cachedPlaylist.Name = playlist.Name;
+
+                    if (playlist.Public != cachedPlaylist.Public)
+                        cachedPlaylist.Public = playlist.Public;
+
+                    if (playlist.SongsChangedAt != cachedPlaylist.SongsChangedAt)
+                        cachedPlaylist.SongsChangedAt = playlist.SongsChangedAt;
+
+                    if (playlist.UpdatedAt != cachedPlaylist.UpdatedAt)
+                        cachedPlaylist.UpdatedAt = playlist.UpdatedAt;
+
+                    cachedAndOrPlaylist = cachedPlaylist;
+                    return false;
+                }
+                else
+                {
+                    _fetchedPlaylists.TryAdd(playlist.ID, playlist);
+                    cachedAndOrPlaylist = playlist;
                     return true;
                 }
             }

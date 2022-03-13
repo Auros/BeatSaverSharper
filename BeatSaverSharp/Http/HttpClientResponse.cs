@@ -52,6 +52,14 @@ namespace BeatSaverSharp.Http
             using JsonTextReader jsonTextReader = new JsonTextReader(reader);
             return _jsonSerializer.Deserialize<T>(jsonTextReader)!;
         }
+
+        public async Task PopulateObjectAsync(object target)
+        {
+            using StringReader reader = new StringReader(await ReadAsStringAsync().ConfigureAwait(false));
+            using JsonTextReader jsonTextReader = new JsonTextReader(reader);
+            _jsonSerializer.Populate(jsonTextReader, target);
+            
+        }
     }
 }
 #endif

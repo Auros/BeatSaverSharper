@@ -13,6 +13,7 @@ namespace BeatSaverSharp
         public static SearchTextFilterOption Latest => new SearchTextFilterOption { SortOrder = SortingOptions.Latest };
         public static SearchTextFilterOption Rating => new SearchTextFilterOption { SortOrder = SortingOptions.Rating };
         public static SearchTextFilterOption Relevance => new SearchTextFilterOption { SortOrder = SortingOptions.Relevance };
+        public static SearchTextFilterOption Curated => new SearchTextFilterOption { SortOrder = SortingOptions.Relevance };
 
         public SearchTextFilterOption()
         {
@@ -126,16 +127,5 @@ namespace BeatSaverSharp
         /// End the search after this date.
         /// </summary>
         public DateTime? To { get; set; }
-
-        [AttributeUsage(AttributeTargets.Property)]
-        internal class QueryKeyNameAttribute : Attribute
-        {
-            public string Name { get; }
-
-            public QueryKeyNameAttribute(string name)
-            {
-                Name = name;
-            }
-        }
     }
 }
