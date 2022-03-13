@@ -8,7 +8,7 @@ namespace BeatSaverSharp.Models.Pages
     {
         private Page? PreviousPage { get; set; }
         private readonly UploadedFilterOptions _query;
-        
+
         public UploadedPage(UploadedFilterOptions query, IReadOnlyList<Beatmap> beatmaps, Page? previousPage = null) : base(beatmaps)
         {
             _query = query;
@@ -35,7 +35,7 @@ namespace BeatSaverSharp.Models.Pages
                 UploadedFilterOptions options = new UploadedFilterOptions(_query.StartDate, Beatmaps[0].Uploaded, _query.IncludeAutomappers, _query.Sort);
                 PreviousPage = await Client.LatestBeatmaps(options, token).ConfigureAwait(false);
             }
-            return await Task.FromResult(PreviousPage);
+            return PreviousPage;
         }
     }
 }

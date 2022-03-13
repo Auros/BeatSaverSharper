@@ -10,7 +10,6 @@ namespace BeatSaverSharp.Models.Pages
         private PlaylistPage? PreviousPage { get; set; }
         private readonly UploadedPlaylistFilterOptions _query;
 
-
         public UploadedPlaylistPage(UploadedPlaylistFilterOptions query, IReadOnlyList<Playlist> playlists, PlaylistPage? previousPage = null) : base(playlists)
         {
             _query = query;
@@ -24,7 +23,7 @@ namespace BeatSaverSharp.Models.Pages
                 var options = new UploadedPlaylistFilterOptions(_query.StartDate, GetSortDate(Playlists[0]), _query.Sort);
                 PreviousPage = await Client.LatestPlaylists(options, token).ConfigureAwait(false);
             }
-            return await Task.FromResult(PreviousPage);
+            return PreviousPage;
         }
 
         public override async Task<PlaylistPage?> Next(CancellationToken token = default)
@@ -42,14 +41,12 @@ namespace BeatSaverSharp.Models.Pages
 
         private DateTime GetSortDate(Playlist playlist)
         {
-            switch (_query.Sort)
+            return _query.Sort switch
             {
-                case LatestPlaylistFilterSort.UPDATED:
-                    return playlist.UpdatedAt;
-                case LatestPlaylistFilterSort.SONGS_UPDATED:
-                    return playlist.SongsChangedAt ?? playlist.UpdatedAt;
-            }
-            return playlist.CreatedAt;
+                LatestPlaylistFilterSort.UPDATED => playlist.UpdatedAt,
+                LatestPlaylistFilterSort.SONGS_UPDATED => playlist.SongsChangedAt ?? playlist.UpdatedAt,
+                _ => playlist.CreatedAt,
+            };
         }
     }
 }

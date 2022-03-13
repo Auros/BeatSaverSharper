@@ -75,7 +75,7 @@ namespace BeatSaverSharp
 
         }
 
-#region Beatmaps
+        #region Beatmaps
 
         public async Task<Beatmap?> Beatmap(string key, CancellationToken token = default, bool skipCacheCheck = false)
         {
@@ -104,7 +104,7 @@ namespace BeatSaverSharp
                 {
                     // Maximum 50 hashes per request
                     var chunks = grouping
-                        .Select((v, i) => new {v, groupIndex = i / 50})
+                        .Select((v, i) => new { v, groupIndex = i / 50 })
                         .GroupBy(x => x.groupIndex)
                         .Select(g => g.Select(x => x.v));
 
@@ -171,9 +171,9 @@ namespace BeatSaverSharp
             return beatmap;
         }
 
-#endregion
+        #endregion
 
-#region Paged Beatmaps
+        #region Paged Beatmaps
 
         public async Task<Page?> LatestBeatmaps(UploadedFilterOptions? options = default, CancellationToken token = default)
         {
@@ -260,14 +260,14 @@ namespace BeatSaverSharp
             };
         }
 
-#endregion
+        #endregion
 
-#region Playlists
+        #region Playlists
 
         public async Task<PlaylistDetail?> Playlist(int id, CancellationToken token = default, int page = 0, bool skipCacheCheck = false)
         {
             var playlistURL = $"/playlists/id/{id}/{page}";
-            
+
             var response = await _httpService.GetAsync(playlistURL, token).ConfigureAwait(false);
             if (!response.Successful)
                 return null;
@@ -290,14 +290,14 @@ namespace BeatSaverSharp
             };
             return playlistDetail;
         }
-        
+
         public async Task<PlaylistPage?> LatestPlaylists(UploadedPlaylistFilterOptions? options = default, CancellationToken token = default)
         {
             if (options == null)
                 options = new UploadedPlaylistFilterOptions();
             StringBuilder sb = new StringBuilder();
             sb.Append("playlists/latest");
-            
+
             var sort = options.Sort.HasValue ? options.Sort.Value switch
             {
                 LatestPlaylistFilterSort.CREATED => "CREATED",
@@ -305,7 +305,7 @@ namespace BeatSaverSharp
                 _ => "SONGS_UPDATED",
             } : "CREATED";
             sb.Append("?sort=").Append(sort);
-            
+
             if (options.StartDate.HasValue)
                 sb.Append("&before=").Append(options.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ"));
             if (options.Before.HasValue)
@@ -320,7 +320,7 @@ namespace BeatSaverSharp
                 Client = this
             };
         }
-        
+
         public async Task<PlaylistPage?> SearchPlaylists(SearchTextPlaylistFilterOptions? searchOptions = default, int page = 0, CancellationToken token = default)
         {
             string searchURL = $"playlists/search/{page}";
@@ -361,9 +361,9 @@ namespace BeatSaverSharp
             };
         }
 
-#endregion
+        #endregion
 
-#region Users
+        #region Users
 
         public async Task<User?> User(int id, CancellationToken token = default, bool skipCacheCheck = false)
         {
@@ -406,9 +406,9 @@ namespace BeatSaverSharp
             return user;
         }
 
-#endregion
+        #endregion
 
-#region Voting
+        #region Voting
 
         /// <summary>
         /// Submits a vote on a map.
@@ -443,9 +443,9 @@ namespace BeatSaverSharp
             return await response.ReadAsObjectAsync<VoteResponse>().ConfigureAwait(false);
         }
 
-#endregion
+        #endregion
 
-#region Byte Fetching
+        #region Byte Fetching
 
         internal async Task<byte[]?> DownloadZIP(BeatmapVersion version, CancellationToken token = default, IProgress<double>? progress = null)
         {
@@ -471,7 +471,7 @@ namespace BeatSaverSharp
             return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
 
-#endregion
+        #endregion
 
         private void ProcessCache()
         {
@@ -536,7 +536,7 @@ namespace BeatSaverSharp
             var page = await response.ReadAsObjectAsync<SerializablePlaylistSearch>().ConfigureAwait(false);
             if (page.Docs.Count == 0)
                 return null;
-            
+
             List<Playlist> playlists = new List<Playlist>();
             foreach (var playlist in page.Docs)
             {
@@ -696,31 +696,31 @@ namespace BeatSaverSharp
                 {
                     if (playlist.CreatedAt != cachedPlaylist.CreatedAt)
                         cachedPlaylist.CreatedAt = playlist.CreatedAt;
-                    
+
                     if (playlist.CuratedAt != cachedPlaylist.CuratedAt)
                         cachedPlaylist.CuratedAt = playlist.CuratedAt;
-                    
-                    if (!ReferenceEquals(playlist.Curator, null) && !playlist.Curator.Equals(cachedPlaylist.Curator))
+
+                    if (playlist.Curator is object && !playlist.Curator.Equals(cachedPlaylist.Curator))
                         cachedPlaylist.Curator = playlist.Curator;
-                    
+
                     if (playlist.DeletedAt != cachedPlaylist.DeletedAt)
                         cachedPlaylist.DeletedAt = playlist.DeletedAt;
-                    
+
                     if (playlist.Description != cachedPlaylist.Description)
                         cachedPlaylist.Description = playlist.Description;
-                    
+
                     if (playlist.Name != cachedPlaylist.Name)
                         cachedPlaylist.Name = playlist.Name;
-                    
+
                     if (playlist.Public != cachedPlaylist.Public)
                         cachedPlaylist.Public = playlist.Public;
-                    
+
                     if (playlist.SongsChangedAt != cachedPlaylist.SongsChangedAt)
                         cachedPlaylist.SongsChangedAt = playlist.SongsChangedAt;
-                    
+
                     if (playlist.UpdatedAt != cachedPlaylist.UpdatedAt)
                         cachedPlaylist.UpdatedAt = playlist.UpdatedAt;
-                    
+
                     cachedAndOrPlaylist = cachedPlaylist;
                     return false;
                 }
