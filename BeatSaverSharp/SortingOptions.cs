@@ -4,6 +4,7 @@
     {
         Latest,
         Relevance,
-        Rating
+        Rating,
+        Curated
     }
 }

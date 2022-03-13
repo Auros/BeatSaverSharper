@@ -13,6 +13,7 @@ namespace BeatSaverSharp
         public static SearchTextPlaylistFilterOptions Latest => new SearchTextPlaylistFilterOptions { SortOrder = SortingOptions.Latest };
         public static SearchTextPlaylistFilterOptions Rating => new SearchTextPlaylistFilterOptions { SortOrder = SortingOptions.Rating };
         public static SearchTextPlaylistFilterOptions Relevance => new SearchTextPlaylistFilterOptions { SortOrder = SortingOptions.Relevance };
+        public static SearchTextPlaylistFilterOptions Curated => new SearchTextPlaylistFilterOptions { SortOrder = SortingOptions.Curated };
 
         public SearchTextPlaylistFilterOptions() { }
 
@@ -35,7 +36,7 @@ namespace BeatSaverSharp
         /// Is a playlist curated
         /// </summary>
         [QueryKeyName("curated")]
-        public bool Curated { get; set; }
+        public bool IsCurated { get; set; }
         
         /// <summary>
         /// Include empty playlists.

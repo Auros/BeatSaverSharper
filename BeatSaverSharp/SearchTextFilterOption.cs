@@ -13,6 +13,7 @@ namespace BeatSaverSharp
         public static SearchTextFilterOption Latest => new SearchTextFilterOption { SortOrder = SortingOptions.Latest };
         public static SearchTextFilterOption Rating => new SearchTextFilterOption { SortOrder = SortingOptions.Rating };
         public static SearchTextFilterOption Relevance => new SearchTextFilterOption { SortOrder = SortingOptions.Relevance };
+        public static SearchTextFilterOption Curated => new SearchTextFilterOption { SortOrder = SortingOptions.Relevance };
 
         public SearchTextFilterOption()
         {
