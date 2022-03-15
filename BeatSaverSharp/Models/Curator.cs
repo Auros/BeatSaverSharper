@@ -39,7 +39,7 @@ namespace BeatSaverSharp.Models
         /// Is curator?
         /// </summary>
         [JsonProperty("curator")]
-        public bool Avatar { get; internal set; } = null!;
+        public bool Curatorbool { get; internal set; } = null!;
 
         internal Curator() { }
         
