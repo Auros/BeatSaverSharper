@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 
 namespace BeatSaverSharp.Models
 {
+    [Obsolete("The Curator model is obsolete and has been replaced with the normal User model.")]
     public class Curator : IEquatable<Curator>
     {
         /// <summary>
