@@ -21,7 +21,7 @@ namespace BeatSaverSharp.Models
         /// The user who curated this map.
         /// </summary>
         [JsonProperty("curator")]
-        public Curator? Curator { get; internal set; }
+        public User? Curator { get; internal set; }
         
         /// <summary>
         /// The time at which this playlist was deleted.

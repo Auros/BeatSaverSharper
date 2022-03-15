@@ -591,6 +591,9 @@ namespace BeatSaverSharp
                     if (beatmap.Uploaded != cachedBeatmap.Uploaded)
                         cachedBeatmap.Uploaded = beatmap.Uploaded;
 
+                    if (beatmap.BeatmapCurator != cachedBeatmap.BeatmapCurator)
+                        cachedBeatmap.BeatmapCurator = beatmap.BeatmapCurator;
+
                     // Setting it to null will cause the LatestVersion property to revalidate the next time it's called.
                     cachedBeatmap.LatestVersion = null!;
                     cachedBeatmap.Versions = beatmap.Versions;
@@ -742,6 +745,12 @@ namespace BeatSaverSharp
             {
                 GetOrAddUserToCache(beatmap.Uploader, out var uploader);
                 beatmap.Uploader = uploader;
+            }
+
+            if (beatmap.BeatmapCurator is object && !beatmap.BeatmapCurator.HasClient)
+            {
+                GetOrAddUserToCache(beatmap.BeatmapCurator, out var curator);
+                beatmap.BeatmapCurator = curator;
             }
 
             foreach (var version in beatmap.Versions)
