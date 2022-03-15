@@ -39,7 +39,7 @@ namespace BeatSaverSharp.Http
         {
             var str = await ReadAsStringAsync().ConfigureAwait(false);
             JsonConvert.PopulateObject(str, target);
-        }
+        } 
     }
 }
 #endif
