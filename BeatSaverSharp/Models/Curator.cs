@@ -18,6 +18,12 @@ namespace BeatSaverSharp.Models
         public string Name { get; internal set; } = null!;
 
         /// <summary>
+        /// Hash of the curator.
+        /// </summary>
+        [JsonProperty("hash")]
+        public string Hash { get; internal set; } = null!;
+
+        /// <summary>
         /// Link of the avatar of the curator.
         /// </summary>
         [JsonProperty("avatar")]
@@ -28,6 +34,12 @@ namespace BeatSaverSharp.Models
         /// </summary>
         [JsonProperty("type")]
         public string Type { get; internal set; } = null!;
+
+        /// <summary>
+        /// Is curator?
+        /// </summary>
+        [JsonProperty("curator")]
+        public bool Avatar { get; internal set; } = null!;
 
         internal Curator() { }
         
