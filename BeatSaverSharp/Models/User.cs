@@ -36,6 +36,18 @@ namespace BeatSaverSharp.Models
         public string Avatar { get; internal set; } = null!;
 
         /// <summary>
+        /// Is this user a curator?
+        /// </summary>
+        [JsonProperty("curator")]
+        public bool Curator { get; internal set; }
+
+        /// <summary>
+        /// User account type.
+        /// </summary>
+        [JsonProperty("type")]
+        public string Type { get; internal set; } = null!;
+
+        /// <summary>
         /// The mapping stats of the user.
         /// </summary>
         [JsonProperty("stats")]
