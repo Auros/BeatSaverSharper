@@ -48,6 +48,12 @@ namespace BeatSaverSharp.Models
         public BeatmapStats Stats { get; internal set; } = null!;
 
         /// <summary>
+        /// The tags (genres) for this map.
+        /// </summary>
+        [JsonProperty("tags")]
+        public ReadOnlyCollection<string> Tags { get; internal set; } = null!;
+
+        /// <summary>
         /// The time at which this map was uploaded.
         /// </summary>
         [JsonProperty("uploaded")]
@@ -82,6 +88,18 @@ namespace BeatSaverSharp.Models
         /// </summary>
         [Obsolete("The Curator model is obsolete. Please use .BeatmapCurator.")]
         public Curator? Curator { get; internal set; }
+        
+        /// <summary>
+        /// The time at which this playlist was curated.
+        /// </summary>
+        [JsonProperty("curatedAt")]
+        public DateTime CuratedAt { get; internal set; }
+        
+        /// <summary>
+        /// The time at which this map was deleted.
+        /// </summary>
+        [JsonProperty("deletedAt")]
+        public DateTime? DeletedAt { get; internal set; }
 
         [JsonProperty("curator")]
         public User? BeatmapCurator { get; internal set; }

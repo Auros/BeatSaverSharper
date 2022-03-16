@@ -590,6 +590,17 @@ namespace BeatSaverSharp
 
                     if (beatmap.Uploaded != cachedBeatmap.Uploaded)
                         cachedBeatmap.Uploaded = beatmap.Uploaded;
+                    
+                    if (beatmap.CuratedAt != cachedBeatmap.CuratedAt)
+                        cachedBeatmap.CuratedAt = beatmap.CuratedAt;
+
+                    if (beatmap.Curator is object && !beatmap.Curator.Equals(cachedBeatmap.Curator))
+                        cachedBeatmap.Curator = beatmap.Curator;
+                    
+                    if (beatmap.DeletedAt != cachedBeatmap.DeletedAt)
+                        cachedBeatmap.DeletedAt = beatmap.DeletedAt;
+
+                    cachedBeatmap.Tags = beatmap.Tags;
 
                     if (beatmap.BeatmapCurator != cachedBeatmap.BeatmapCurator)
                         cachedBeatmap.BeatmapCurator = beatmap.BeatmapCurator;
