@@ -15,7 +15,7 @@ namespace BeatSaverSharp.Models
         /// The time at which this playlist was curated.
         /// </summary>
         [JsonProperty("curatedAt")]
-        public DateTime CuratedAt { get; internal set; }
+        public DateTime? CuratedAt { get; internal set; }
         
         /// <summary>
         /// The user who curated this map.
