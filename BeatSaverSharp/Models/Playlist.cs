@@ -60,6 +60,12 @@ namespace BeatSaverSharp.Models
         public string CoverURL { get; internal set; } = null!;
         
         /// <summary>
+        /// The relative URL of where to download this playlist
+        /// </summary>
+        [JsonProperty("downloadURL")]
+        public string DownloadURL { get; internal set; } = null!;
+        
+        /// <summary>
         /// If the playlist is public or not.
         /// </summary>
         [JsonProperty("public")]
