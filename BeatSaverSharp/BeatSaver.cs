@@ -360,6 +360,18 @@ namespace BeatSaverSharp
                 Client = this
             };
         }
+        
+        public async Task<PlaylistPage?> UserPlaylists(int userID, int page = 0, CancellationToken token = default)
+        {
+            var result = await GetPlaylistsFromPage($"playlists/user/{userID}/{page}", token).ConfigureAwait(false);
+            if (result is null)
+                return null;
+
+            return new PlaylistUserPage(page, userID, result)
+            {
+                Client = this
+            };
+        }
 
         #endregion
 

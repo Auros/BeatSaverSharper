@@ -81,5 +81,16 @@ namespace BeatSaverSharp.Tests
             Assert.IsNotNull(previousPage);
             CollectionAssert.AreEqual(latestPage.Playlists.ToList(), previousPage.Playlists.ToList());
         }
+        
+        [TestMethod]
+        public async Task TestUsers()
+        {
+            var joetasticPlaylists = await Client.UserPlaylists(58338);
+            
+            Assert.IsNotNull(joetasticPlaylists);
+            var nextPage = await joetasticPlaylists.Next();
+            Assert.IsNotNull(nextPage);
+            CollectionAssert.AreNotEqual(joetasticPlaylists.Playlists.ToList(), nextPage.Playlists.ToList());
+        }
     }
 }

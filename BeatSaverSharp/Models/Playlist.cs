@@ -76,7 +76,7 @@ namespace BeatSaverSharp.Models
         /// </summary>
         [JsonProperty("updatedAt")]
         public DateTime UpdatedAt { get; internal set; }
-
+        
         #region Equality
 
         public bool Equals(Playlist? other) => ID == other?.ID;
