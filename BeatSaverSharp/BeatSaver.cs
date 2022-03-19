@@ -751,6 +751,10 @@ namespace BeatSaverSharp
                 {
                     _fetchedPlaylists.TryAdd(playlist.ID, playlist);
                     cachedAndOrPlaylist = playlist;
+                    if (!cachedAndOrPlaylist.HasClient)
+                    {
+                        cachedAndOrPlaylist.Client = this;
+                    }
                     return true;
                 }
             }

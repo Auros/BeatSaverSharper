@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using BeatSaverSharp.Models.Pages;
 using Newtonsoft.Json;
 
 namespace BeatSaverSharp.Models
@@ -83,6 +86,8 @@ namespace BeatSaverSharp.Models
         [JsonProperty("updatedAt")]
         public DateTime UpdatedAt { get; internal set; }
         
+        public Task<PlaylistDetail?> GetPlaylistDetail(CancellationToken token = default) => Client.Playlist(ID, token);
+
         #region Equality
 
         public bool Equals(Playlist? other) => ID == other?.ID;
