@@ -266,7 +266,7 @@ namespace BeatSaverSharp
 
         public async Task<PlaylistDetail?> Playlist(int id, CancellationToken token = default, int page = 0, bool skipCacheCheck = false)
         {
-            var playlistURL = $"/playlists/id/{id}/{page}";
+            var playlistURL = $"playlists/id/{id}/{page}";
 
             var response = await _httpService.GetAsync(playlistURL, token).ConfigureAwait(false);
             if (!response.Successful)
@@ -280,7 +280,7 @@ namespace BeatSaverSharp
             foreach (var beatmap in result.Beatmaps)
             {
                 GetOrAddBeatmapToCache(beatmap.Map, out Beatmap selfOrCached);
-                beatmapList.Add(new OrderedBeatmap(selfOrCached, beatmap.Order));
+                beatmapList.Add(new OrderedBeatmap(selfOrCached, beatmap.Order){Client = this});
             }
             var beatmaps = new ReadOnlyCollection<OrderedBeatmap>(beatmapList);
 

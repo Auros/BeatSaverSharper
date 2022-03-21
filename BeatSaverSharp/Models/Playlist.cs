@@ -85,8 +85,8 @@ namespace BeatSaverSharp.Models
         /// </summary>
         [JsonProperty("updatedAt")]
         public DateTime UpdatedAt { get; internal set; }
-        
-        public Task<PlaylistDetail?> GetPlaylistDetail(CancellationToken token = default) => Client.Playlist(ID, token);
+
+        public Task<PlaylistDetail?> GetPlaylistDetail(CancellationToken token = default, int page = 0, bool skipCacheCheck = false) => Client.Playlist(ID, token, page, skipCacheCheck);
 
         #region Equality
 
