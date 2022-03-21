@@ -88,6 +88,10 @@ namespace BeatSaverSharp.Models
 
         public Task<PlaylistDetail?> GetPlaylistDetail(CancellationToken token = default, int page = 0, bool skipCacheCheck = false) => Client.Playlist(ID, token, page, skipCacheCheck);
 
+        public Task<byte[]?> DownloadPlaylist(CancellationToken token = default, IProgress<double>? progress = null) => Client.DownloadPlaylist(this, token, progress);
+
+        public Task<byte[]?> DownloadCoverImage(CancellationToken token = default, IProgress<double>? progress = null) => Client.DownloadCoverImage(this, token, progress);
+
         #region Equality
 
         public bool Equals(Playlist? other) => ID == other?.ID;

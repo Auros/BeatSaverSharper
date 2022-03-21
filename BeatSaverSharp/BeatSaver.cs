@@ -482,6 +482,22 @@ namespace BeatSaverSharp
                 return null;
             return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
+        
+        internal async Task<byte[]?> DownloadPlaylist(Playlist playlist, CancellationToken token = default, IProgress<double>? progress = null)
+        {
+            var response = await _httpService.GetAsync(playlist.DownloadURL, token, progress).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+            return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
+        }
+        
+        internal async Task<byte[]?> DownloadCoverImage(Playlist playlist, CancellationToken token = default, IProgress<double>? progress = null)
+        {
+            var response = await _httpService.GetAsync(playlist.CoverURL, token, progress).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+            return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
+        }
 
         #endregion
 
