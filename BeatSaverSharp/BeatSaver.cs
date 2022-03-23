@@ -266,7 +266,7 @@ namespace BeatSaverSharp
 
         public async Task<PlaylistDetail?> Playlist(int id, CancellationToken token = default, int page = 0, bool skipCacheCheck = false)
         {
-            var playlistURL = $"/playlists/id/{id}/{page}";
+            var playlistURL = $"playlists/id/{id}/{page}";
 
             var response = await _httpService.GetAsync(playlistURL, token).ConfigureAwait(false);
             if (!response.Successful)
@@ -280,7 +280,7 @@ namespace BeatSaverSharp
             foreach (var beatmap in result.Beatmaps)
             {
                 GetOrAddBeatmapToCache(beatmap.Map, out Beatmap selfOrCached);
-                beatmapList.Add(new OrderedBeatmap(selfOrCached, beatmap.Order));
+                beatmapList.Add(new OrderedBeatmap(selfOrCached, beatmap.Order){Client = this});
             }
             var beatmaps = new ReadOnlyCollection<OrderedBeatmap>(beatmapList);
 
@@ -356,6 +356,18 @@ namespace BeatSaverSharp
                 return null;
 
             return new PlaylistSearchPage(page, searchOptions, result)
+            {
+                Client = this
+            };
+        }
+        
+        public async Task<PlaylistPage?> UserPlaylists(int userID, int page = 0, CancellationToken token = default)
+        {
+            var result = await GetPlaylistsFromPage($"playlists/user/{userID}/{page}", token).ConfigureAwait(false);
+            if (result is null)
+                return null;
+
+            return new PlaylistUserPage(page, userID, result)
             {
                 Client = this
             };
@@ -466,6 +478,22 @@ namespace BeatSaverSharp
         internal async Task<byte[]?> DownloadPreview(BeatmapVersion version, CancellationToken token = default, IProgress<double>? progress = null)
         {
             var response = await _httpService.GetAsync(version.PreviewURL, token, progress).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+            return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
+        }
+        
+        internal async Task<byte[]?> DownloadPlaylist(Playlist playlist, CancellationToken token = default, IProgress<double>? progress = null)
+        {
+            var response = await _httpService.GetAsync(playlist.DownloadURL, token, progress).ConfigureAwait(false);
+            if (!response.Successful)
+                return null;
+            return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
+        }
+        
+        internal async Task<byte[]?> DownloadCoverImage(Playlist playlist, CancellationToken token = default, IProgress<double>? progress = null)
+        {
+            var response = await _httpService.GetAsync(playlist.CoverURL, token, progress).ConfigureAwait(false);
             if (!response.Successful)
                 return null;
             return await response.ReadAsByteArrayAsync().ConfigureAwait(false);
@@ -739,6 +767,10 @@ namespace BeatSaverSharp
                 {
                     _fetchedPlaylists.TryAdd(playlist.ID, playlist);
                     cachedAndOrPlaylist = playlist;
+                    if (!cachedAndOrPlaylist.HasClient)
+                    {
+                        cachedAndOrPlaylist.Client = this;
+                    }
                     return true;
                 }
             }

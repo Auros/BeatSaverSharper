@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using BeatSaverSharp.Models.Pages;
 using Newtonsoft.Json;
 
 namespace BeatSaverSharp.Models
@@ -60,6 +63,12 @@ namespace BeatSaverSharp.Models
         public string CoverURL { get; internal set; } = null!;
         
         /// <summary>
+        /// The relative URL of where to download this playlist
+        /// </summary>
+        [JsonProperty("downloadURL")]
+        public string DownloadURL { get; internal set; } = null!;
+        
+        /// <summary>
         /// If the playlist is public or not.
         /// </summary>
         [JsonProperty("public")]
@@ -76,6 +85,12 @@ namespace BeatSaverSharp.Models
         /// </summary>
         [JsonProperty("updatedAt")]
         public DateTime UpdatedAt { get; internal set; }
+
+        public Task<PlaylistDetail?> GetPlaylistDetail(CancellationToken token = default, int page = 0, bool skipCacheCheck = false) => Client.Playlist(ID, token, page, skipCacheCheck);
+
+        public Task<byte[]?> DownloadPlaylist(CancellationToken token = default, IProgress<double>? progress = null) => Client.DownloadPlaylist(this, token, progress);
+
+        public Task<byte[]?> DownloadCoverImage(CancellationToken token = default, IProgress<double>? progress = null) => Client.DownloadCoverImage(this, token, progress);
 
         #region Equality
 
