@@ -41,7 +41,7 @@ namespace BeatSaverSharp.Tests
         }
 
         [TestMethod]
-        public async Task NoodleExtensionsAndChromaOnly()
+        public async Task NoodleExtensionsOrChromaOnly()
         {
             var noodleExtensions = await Client.SearchBeatmaps(new SearchTextFilterOption
             {
@@ -53,7 +53,7 @@ namespace BeatSaverSharp.Tests
 
             foreach (var map in noodleExtensions.Beatmaps)
             {
-                Assert.IsTrue(map.LatestVersion.Difficulties.Any(d => d.NoodleExtensions && d.Chroma));
+                Assert.IsTrue(map.LatestVersion.Difficulties.Any(d => d.NoodleExtensions || d.Chroma));
             }
         }
 
