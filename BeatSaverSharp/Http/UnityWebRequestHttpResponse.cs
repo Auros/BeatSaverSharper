@@ -32,7 +32,7 @@ namespace BeatSaverSharp.Http
         public async Task<T> ReadAsObjectAsync<T>() where T : class
         {
             var str = await ReadAsStringAsync().ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<T>(str);
+            return JsonConvert.DeserializeObject<T>(str)!;
         }
 
         public async Task PopulateObjectAsync(object target)
