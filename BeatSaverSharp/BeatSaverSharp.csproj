@@ -5,7 +5,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
-        <Version>3.4.2</Version>
+        <Version>3.4.3</Version>
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
         <Configurations>Debug;Release;Release-Unity</Configurations>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
