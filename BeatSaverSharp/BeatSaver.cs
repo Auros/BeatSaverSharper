@@ -5,12 +5,16 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using BeatSaverSharp.Websocket;
+using IWebsocketClientLite.PCL;
+using Newtonsoft.Json;
 
 namespace BeatSaverSharp
 {
@@ -23,11 +27,13 @@ namespace BeatSaverSharp
 
         private BeatSaverOptions _options;
         private readonly IHttpService _httpService;
+        private readonly IWebsocketClient _websocketClient;
         private readonly object _bLock = new object();
         private readonly object _uLock = new object();
         private readonly object _pLock = new object();
         private static readonly (string, PropertyInfo)[] _filterProperties;
         private static readonly (string, PropertyInfo)[] _playlistFilterProperties;
+        private static readonly JsonSerializer _jsonSerializer = new JsonSerializer();
         private readonly ConcurrentDictionary<int, User> _fetchedUsers = new ConcurrentDictionary<int, User>();
         private readonly ConcurrentDictionary<string, User> _fetchedUsernames = new ConcurrentDictionary<string, User>();
         private readonly ConcurrentDictionary<string, Beatmap> _fetchedBeatmaps = new ConcurrentDictionary<string, Beatmap>();
@@ -68,6 +74,8 @@ namespace BeatSaverSharp
 #else
             _httpService = new HttpClientService(beatSaverOptions.BeatSaverAPI.ToString(), beatSaverOptions.Timeout, userAgent);
 #endif
+            _websocketClient = new WebsocketClient(beatSaverOptions.WebsocketAPI.ToString(), userAgent);
+            _websocketClient.MessageRecievedEvent += OnWebsocketMessageRecieved;
         }
 
         public BeatSaver(string applicationName, Version version) : this(new BeatSaverOptions(applicationName, version))
@@ -501,6 +509,23 @@ namespace BeatSaverSharp
 
         #endregion
 
+        #region Websocket
+
+        public event Action<WsBeatmap>? WebsocketMessageRecievedEvent;
+        
+        private void OnWebsocketMessageRecieved(IDataframe dataframe)
+        {
+            if (WebsocketMessageRecievedEvent == null || dataframe.Message == null)
+                return;         
+            
+            using StringReader reader = new StringReader(dataframe.Message);
+            using JsonTextReader jsonTextReader = new JsonTextReader(reader);
+            WsBeatmap wsBeatmap = _jsonSerializer.Deserialize<WsBeatmap>(jsonTextReader)!;
+            WebsocketMessageRecievedEvent.Invoke(wsBeatmap);
+        }
+
+        #endregion
+
         private void ProcessCache()
         {
             if (_options.MaximumCacheSize == null || _options.MaximumCacheSize == 0)
@@ -826,8 +851,11 @@ namespace BeatSaverSharp
         public void Dispose()
         {
             GC.SuppressFinalize(this);
-            if (_httpService is IDisposable disposable)
-                disposable.Dispose();
+            _websocketClient.MessageRecievedEvent -= OnWebsocketMessageRecieved;
+            if (_httpService is IDisposable httpDisposable)
+                httpDisposable.Dispose();
+            if (_websocketClient is IDisposable wsDisposable)
+                wsDisposable.Dispose();
             IsDisposed = true;
         }
     }
