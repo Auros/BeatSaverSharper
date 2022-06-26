@@ -521,6 +521,8 @@ namespace BeatSaverSharp
             using StringReader reader = new StringReader(dataframe.Message);
             using JsonTextReader jsonTextReader = new JsonTextReader(reader);
             WsBeatmap wsBeatmap = _jsonSerializer.Deserialize<WsBeatmap>(jsonTextReader)!;
+            GetOrAddBeatmapToCache(wsBeatmap.Map, out var cachedAndOrBeatmap);
+            wsBeatmap.Map = cachedAndOrBeatmap;
             WebsocketMessageRecievedEvent.Invoke(wsBeatmap);
         }
 
