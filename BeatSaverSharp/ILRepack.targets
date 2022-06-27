@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Target Name="ILRepacker" AfterTargets="Build">
+        <ItemGroup>
+            <InputAssemblies Include="$(OutputPath)\BeatSaverSharp.dll" />
+            <InputAssemblies Include="$(OutputPath)\HttpMachine.dll" />
+            <InputAssemblies Include="$(OutputPath)\IHttpMachine.dll" />
+            <InputAssemblies Include="$(OutputPath)\IWebsocketClientLite.dll" />
+            <InputAssemblies Include="$(OutputPath)\WebsocketClientLite.dll" />
+        </ItemGroup>
+
+        <ILRepack
+                Union="true"
+                RenameInternalized="true"
+                Parallel="true"
+                Internalize="true"
+                InputAssemblies="@(InputAssemblies)"
+                TargetKind="Dll"
+                OutputFile="$(OutputPath)\Merged\$(AssemblyName).dll"
+        />
+    </Target>
+</Project>
