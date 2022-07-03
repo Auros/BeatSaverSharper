@@ -36,7 +36,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ILRepack.Lib.MSBuild" Version="2.1.18" />
         <PackageReference Include="WebsocketClientLite.PCL" Version="7.3.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
@@ -59,4 +58,6 @@
             <CopyLocal>False</CopyLocal>
         </Reference>
     </ItemGroup>
+
+    <Import Project="ILRepack.targets" Condition="'$(Configuration)' != 'Debug'"  />
 </Project>
