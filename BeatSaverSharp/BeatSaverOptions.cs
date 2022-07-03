@@ -7,6 +7,7 @@ namespace BeatSaverSharp
         public Version Version { get; set; }
         public string ApplicationName { get; set; }
         public Uri BeatSaverAPI { get; set; } = new Uri("https://api.beatsaver.com/");
+        public Uri WebsocketAPI { get; set; } = new Uri("wss://ws.beatsaver.com/maps");
         public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(30);
         public bool Cache { get; set; } = true;
         
