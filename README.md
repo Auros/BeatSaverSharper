@@ -14,7 +14,7 @@ This project is a replacement/continuation of BeatSaverSharp, the official .NET 
 
 ## 🛠️ Building
 
-Building requires at least the .NET 5 SDK. The main project is .NET Standard 2.0, however the tests use .NET 5.
+Building requires at least the .NET 6 SDK. The main project is .NET Standard 2.0, however the tests use .NET 6.
 
 Pull from git or download this repository.
 
