@@ -125,7 +125,8 @@ namespace BeatSaverSharp.Models
             _360Degree,
 
             Lightshow,
-            Lawless
+            Lawless,
+            Legacy
         }
 
         public enum BeatSaverBeatmapDifficulty
