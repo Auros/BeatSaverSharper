@@ -87,6 +87,7 @@ namespace BeatSaverSharp.Models
         /// The person who curated this map.
         /// </summary>
         [Obsolete("The Curator model is obsolete. Please use .BeatmapCurator.")]
+        [JsonIgnore] // Fix JsonProperty mismatch
         public Curator? Curator { get; internal set; }
         
         /// <summary>
