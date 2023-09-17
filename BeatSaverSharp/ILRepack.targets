@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <PackageReference Include="ILRepack" Version="2.*">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <Target Name="ILRepack"
+            AfterTargets="Build">
+
+        <PropertyGroup>
+            <WorkingDirectory>$(ProjectDir)$(OutputPath)</WorkingDirectory>
+            <ILRepackOutputDir>Merged\</ILRepackOutputDir>
+            <ILRepackOutput>$(ILRepackOutputDir)$(AssemblyName).dll</ILRepackOutput>
+        </PropertyGroup>
+
+        <ItemGroup>
+            <RepackInputAssemblies Include="$(TargetPath)"/>
+            <RepackInputAssemblies Include="HttpMachine.dll"/>
+            <RepackInputAssemblies Include="IHttpMachine.dll"/>
+            <RepackInputAssemblies Include="IWebsocketClientLite.dll"/>
+            <RepackInputAssemblies Include="WebsocketClientLite.dll"/>
+        </ItemGroup>
+
+        <!-- ReferencePath contains actual files which can be referenced, we need directories -->
+        <ItemGroup>
+            <!-- Transform each entry into its directory -->
+            <_ReferenceDirsDupl Include="@(ReferencePath->'%(RelativeDir)')" />
+        </ItemGroup>
+        <!-- De-duplicate the directories for sanity -->
+        <RemoveDuplicates Inputs="@(_ReferenceDirsDupl)">
+            <Output TaskParameter="Filtered" ItemName="_ReferenceDirs" />
+        </RemoveDuplicates>
+
+        <Message Importance="low" Text="referencedirs @(_ReferenceDirs)" />
+
+        <ItemGroup>
+            <_ILRCmdArg Include="/union"/>
+            <_ILRCmdArg Include="/parallel"/>
+            <_ILRCmdArg Include="/internalize"/>
+            <_ILRCmdArg Include="/renameInternalized"/>
+            <_ILRCmdArg Include="/lib:%(_ReferenceDirs.Identity)" Condition="'$(OS)' != 'Windows_NT'" />
+            <_ILRCmdArg Include="/xmldocs"/>
+            <_ILRCmdArg Include="/out:$(ILRepackOutput)"/>
+            <_ILRCmdArg Include="%(RepackInputAssemblies.Identity)"/>
+        </ItemGroup>
+
+        <Exec WorkingDirectory="$(WorkingDirectory)"
+              Command="$(ILRepack) @(_ILRCmdArg->'&quot;%(Identity)&quot;', ' ')"/>
+
+    </Target>
+</Project>

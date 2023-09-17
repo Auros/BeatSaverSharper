@@ -16,6 +16,7 @@
         </Description>
         <PackageTags>beatsaber beatsaver</PackageTags>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 
     <ItemGroup>
@@ -35,6 +36,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="WebsocketClientLite.PCL" Version="7.3.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 
@@ -57,4 +59,5 @@
         </Reference>
     </ItemGroup>
 
+    <Import Project="ILRepack.targets" Condition="'$(Configuration)' != 'Debug'"  />
 </Project>
